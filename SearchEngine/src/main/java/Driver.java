@@ -25,7 +25,7 @@ public class Driver {
 
 		// output arguments
 		System.out.println(Arrays.toString(args));
-
+		//System.out(Verify);
 		// calculate time elapsed and output
 		Duration elapsed = Duration.between(start, Instant.now());
 		double seconds = (double) elapsed.toMillis() / Duration.ofSeconds(1).toMillis();
