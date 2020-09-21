@@ -23,7 +23,7 @@ public class TextFileIndex{
 	 * Adds the location and word.
 	 *
 	 * @param location the location the word was found
-	 * @param word the word found
+	 * @param word the word foundd
 	 */
 	public void add(String location, String word,int pos) {
 		if(map.containsKey(word)) {
