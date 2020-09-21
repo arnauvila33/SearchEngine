@@ -15,7 +15,7 @@ import java.util.Map.Entry;
 public class TextFileIndex{
 	
 	/** map where values are stored */
-	Map<String, Map<String, ArrayList<Integer>>> map=new TreeMap<String ,Map<String, ArrayList<Integer>>>();
+	Map<String, TreeMap<String, ArrayList<Integer>>> map=new TreeMap<String ,TreeMap<String, ArrayList<Integer>>>();
 	
 	
 	public Map<String, ? extends Collection<Integer>> ret() {
@@ -39,7 +39,7 @@ public class TextFileIndex{
 			}
 		}
 		else {
-			Map<String, ArrayList<Integer>> map1=new HashMap<String, ArrayList<Integer>>();
+			TreeMap<String, ArrayList<Integer>> map1=new TreeMap<String, ArrayList<Integer>>();
 			ArrayList<Integer> ls=new ArrayList<Integer>();
 			ls.add(pos);
 			map1.put(location, ls);

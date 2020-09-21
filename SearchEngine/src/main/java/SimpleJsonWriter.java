@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 /**
@@ -77,13 +78,13 @@ public class SimpleJsonWriter {
 		
 	}
 	
-	public static void invertedIndex(Map<String, Map<String, ArrayList<Integer>>> m, Writer writer, int level)throws IOException {
+	public static void invertedIndex(Map<String, TreeMap<String, ArrayList<Integer>>> m, Writer writer, int level)throws IOException {
 		indent(writer,level);
 		writer.write("{");
 		int c=0;
 		int c1=0;
 		writer.write("\n");
-		for(Entry<String, Map<String, ArrayList<Integer>>> entry: m.entrySet()) {
+		for(Entry<String, TreeMap<String, ArrayList<Integer>>> entry: m.entrySet()) {
 			c++;
 			indent(entry.getKey(),writer,level+1);
 			writer.write(": {");
@@ -95,8 +96,8 @@ public class SimpleJsonWriter {
 				indent(ent.getKey(),writer,level+2);
 				writer.write(": ");
 				asArray(ent.getValue(),writer,level+2);
-				//if(c1!=ent.getValue().size())
-					//writer.write(",");
+				if(c1!=entry.getValue().size())
+					writer.write(",");
 				writer.write("\n");				
 			}
 			indent(writer,level+1);
@@ -344,7 +345,7 @@ public class SimpleJsonWriter {
 		}
 	}
 	
-	public static String asinvertedIndex(Map<String, Map<String, ArrayList<Integer>>> elements) {
+	public static String asinvertedIndex(Map<String, TreeMap<String, ArrayList<Integer>>> elements) {
 		// THIS CODE IS PROVIDED FOR YOU; DO NOT MODIFY
 		try {
 			StringWriter writer = new StringWriter();
@@ -355,7 +356,7 @@ public class SimpleJsonWriter {
 			return null;
 		}
 	}
-	public static void asinvertedIndex(Map<String, Map<String, ArrayList<Integer>>> elements, Path path) throws IOException {
+	public static void asinvertedIndex(Map<String, TreeMap<String, ArrayList<Integer>>> elements, Path path) throws IOException {
 		// THIS CODE IS PROVIDED FOR YOU; DO NOT MODIFY
 		try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
 			invertedIndex(elements, writer, 0);
