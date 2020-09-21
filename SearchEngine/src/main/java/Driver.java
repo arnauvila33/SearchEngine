@@ -31,20 +31,22 @@ public class Driver {
 		Path out=null;
 		ArgumentMap am=new ArgumentMap(args);
 	
-		
+		System.out.println("1 "+out);
 		if(am.hasFlag("-path")==false&&am.hasFlag("-index")==true) {
 			System.out.println("TRAPPED!");
 			TextFileIndex txtF=new TextFileIndex();
 			SimpleJsonWriter.asinvertedIndex(txtF.map,Paths.get("index.json"));
 		}
-
+		System.out.println("2 "+out);
 		if(args.length<2||am.hasFlag("-path")==false||am.getPath("-path")==null) {
 			return;
 			
 		}
+		System.out.println("3 "+out);
 		if(!am.getPath("-path").toString().contains("\\")) {
 			return;
 		}
+		System.out.println("4 "+out);
 		
 		
 		if(!am.hasFlag("-index")){
@@ -56,11 +58,11 @@ public class Driver {
 			out=am.getPath("-index");
 			
 		}
-		
+		System.out.println("5 "+out);
 		if(am.getString("-path").toLowerCase().endsWith(".txt")||am.getString("-path").toLowerCase().endsWith(".text")||am.getString("-path").toLowerCase().endsWith(".md")){
 			singleFile=true;
 		}
-		System.out.println(out);
+		
 		if(singleFile) {
 			singleTxt(am.getPath("-path"),out,outputFile);
 		}
@@ -82,7 +84,7 @@ public class Driver {
 			if(outputFile==true) {
 				//System.out.println(SimpleJsonWriter.asinvertedIndex(txtF.map));
 				//System.out.println(out.toString()+"   "+out);
-				SimpleJsonWriter.asinvertedIndex(txtF.map,out);
+				SimpleJsonWriter.asinvertedIndex(txtF.map,out.normalize());
 			}
 		}
 		//System.out.println("OutputFile: "+outputFile+" SingleFile: "+singleFile);
@@ -130,7 +132,7 @@ public class Driver {
 		if(outputFile==true) {
 			//System.out.println(SimpleJsonWriter.asinvertedIndex(txtF.map));
 		
-			SimpleJsonWriter.asinvertedIndex(txtF.map,out);
+			SimpleJsonWriter.asinvertedIndex(txtF.map,out.normalize());
 		}
 		
 		
