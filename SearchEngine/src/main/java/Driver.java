@@ -60,6 +60,7 @@ public class Driver {
 		if(am.getString("-path").toLowerCase().endsWith(".txt")||am.getString("-path").toLowerCase().endsWith(".text")||am.getString("-path").toLowerCase().endsWith(".md")){
 			singleFile=true;
 		}
+		System.out.println(out);
 		if(singleFile) {
 			singleTxt(am.getPath("-path"),out,outputFile);
 		}
