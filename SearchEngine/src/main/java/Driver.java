@@ -8,6 +8,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.TreeMap;
 
 
 
@@ -28,17 +30,14 @@ public class Driver {
 		boolean singleFile=false;
 		Path out=null;
 		ArgumentMap am=new ArgumentMap(args);
-		File f=new File("index.json");
+	
 		
 		if(am.hasFlag("-path")==false&&am.hasFlag("-index")==true) {
 			System.out.println("TRAPPED!");
-			//File f=new File("index.json");
-			f.mkdir();
-			return;
+			TextFileIndex txtF=new TextFileIndex();
+			SimpleJsonWriter.asinvertedIndex(txtF.map,Paths.get("index.json"));
 		}
-		else if(f.exists()) {
-			f.delete();
-		}
+
 		if(args.length<2||am.hasFlag("-path")==false||am.getPath("-path")==null) {
 			return;
 			
