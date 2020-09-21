@@ -9,13 +9,19 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+
+
 /**
  * Class responsible for running this project based on the provided command-line
  * arguments. See the README for details.
  */
 public class Driver {
 	
-	
+	/**
+	 * Main method for invertedIndex
+	 * @param args the args passed
+	 * @throws Exception
+	 */
 	private static void invertedIndex(String[] args) throws Exception {
 		
 		boolean outputFile=true;
@@ -24,21 +30,36 @@ public class Driver {
 		ArgumentMap am=new ArgumentMap(args);
 		
 		
-		
-		if(args.length<2||am.hasFlag("-path")==false) {
+		if(am.hasFlag("-path")==false&&am.hasFlag("-index")==true) {
+			System.out.println("TRAPPED!");
+			File f=new File("index.json");
+			f.mkdir();
+			return;
+		}
+		if(args.length<2||am.hasFlag("-path")==false||am.getPath("-path")==null) {
+			return;
+			
+		}
+		if(!am.getPath("-path").toString().contains("\\")) {
 			return;
 		}
 		
+		
 		if(!am.hasFlag("-index")){
 			outputFile=false;
-		}else
-			out=am.getPath("-index", Paths.get("index.txt"));
-
+		}else if(am.getPath("-index")==null)
+			out=am.getPath("-index",Paths.get("index.json"));
+		else {
+			
+			out=am.getPath("-index");
+			
+		}
+		
 		if(am.getString("-path").toLowerCase().endsWith(".txt")||am.getString("-path").toLowerCase().endsWith(".text")||am.getString("-path").toLowerCase().endsWith(".md")){
 			singleFile=true;
 		}
 		if(singleFile) {
-			singleTxt(am.getPath("-path"),out);
+			singleTxt(am.getPath("-path"),out,outputFile);
 		}
 		else {
 			TextFileIndex txtF=new TextFileIndex();
@@ -53,17 +74,22 @@ public class Driver {
 				}
 			
 			}
-			SimpleJsonWriter json=new SimpleJsonWriter();
+	
 			
-			if(out!=null) {
+			if(outputFile==true) {
 				//System.out.println(SimpleJsonWriter.asinvertedIndex(txtF.map));
-				System.out.println(out.toString()+"   "+out);
+				//System.out.println(out.toString()+"   "+out);
 				SimpleJsonWriter.asinvertedIndex(txtF.map,out);
 			}
 		}
 		//System.out.println("OutputFile: "+outputFile+" SingleFile: "+singleFile);
 	}
 	
+	/**
+	 * Used to check if p is txt file
+	 * @param p path passed
+	 * @return boolean
+	 */
 	private static boolean isTxtFile(Path p) {
 		if(p.toString().toLowerCase().endsWith(".txt")||p.toString().toLowerCase().endsWith(".text")){
 			if(p.toString().toLowerCase().endsWith(".text")) {
@@ -80,7 +106,14 @@ public class Driver {
 		return false;
 	}
 	
-	private static void singleTxt(Path in,Path out) throws IOException {
+	/**
+	 * Used to compute a singleTxt file
+	 * @param in path
+	 * @param out path
+	 * @param outputFile see if it should have output file or not
+	 * @throws IOException
+	 */
+	private static void singleTxt(Path in,Path out,boolean outputFile) throws IOException {
 		TextFileStemmer stemmer=new TextFileStemmer();
 		ArrayList<String> input=TextFileStemmer.listStems(in);
 		TextFileIndex txtF=new TextFileIndex();
@@ -91,14 +124,21 @@ public class Driver {
 			txtF.add(in.toString(), x, i++);
 		}
 	
-		if(out!=null) {
+		if(outputFile==true) {
 			//System.out.println(SimpleJsonWriter.asinvertedIndex(txtF.map));
-			
+		
 			SimpleJsonWriter.asinvertedIndex(txtF.map,out);
 		}
 		
 		
 	}
+	/**
+	 * Recursive function used to traverse all directories and find txt files.
+	 * @param directory directory to look for
+	 * @param list list to keep all text files
+	 * @return the list with all the txt files
+	 * @throws IOException
+	 */
 	private static ArrayList<Path> traverseDirectory(Path directory, ArrayList<Path> list) throws IOException {
 		//ArrayList<Path> list=new ArrayList<>();
 		try (DirectoryStream<Path> listing = Files.newDirectoryStream(directory)) {

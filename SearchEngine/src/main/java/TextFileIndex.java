@@ -132,6 +132,12 @@ public class TextFileIndex{
 		return set;
 	}
 	
+	/**
+	 * Returns the path of the word.
+	 * @param location word
+	 * @param loc path
+	 * @return the list
+	 */
 	public Collection<Integer> get(String location, Path loc){
 		ArrayList<Integer> l=new ArrayList<Integer>();
 		if(map.containsKey(location)) {

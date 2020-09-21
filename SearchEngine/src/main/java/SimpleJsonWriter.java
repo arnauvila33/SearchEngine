@@ -78,6 +78,13 @@ public class SimpleJsonWriter {
 		
 	}
 	
+	/**
+	 * Writes invertedIndex in pretty json format
+	 * @param m map passed
+	 * @param writer used
+	 * @param level to indent
+	 * @throws IOException
+	 */
 	public static void invertedIndex(Map<String, TreeMap<String, ArrayList<Integer>>> m, Writer writer, int level)throws IOException {
 		indent(writer,level);
 		writer.write("{");
@@ -345,6 +352,11 @@ public class SimpleJsonWriter {
 		}
 	}
 	
+	/**
+	 * Returns inverted index in a pretty json format to string
+	 * @param elements map
+	 * @return string
+	 */
 	public static String asinvertedIndex(Map<String, TreeMap<String, ArrayList<Integer>>> elements) {
 		// THIS CODE IS PROVIDED FOR YOU; DO NOT MODIFY
 		try {
@@ -356,6 +368,12 @@ public class SimpleJsonWriter {
 			return null;
 		}
 	}
+	/**
+	 * Writes the inverted index in a pretty json format to a file
+	 * @param elements map
+	 * @param path used
+	 * @throws IOException
+	 */
 	public static void asinvertedIndex(Map<String, TreeMap<String, ArrayList<Integer>>> elements, Path path) throws IOException {
 		// THIS CODE IS PROVIDED FOR YOU; DO NOT MODIFY
 		try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
