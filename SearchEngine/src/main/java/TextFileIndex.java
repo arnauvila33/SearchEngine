@@ -18,9 +18,7 @@ public class TextFileIndex{
 	Map<String, TreeMap<String, ArrayList<Integer>>> map=new TreeMap<String ,TreeMap<String, ArrayList<Integer>>>();
 	
 	
-	public Map<String, ? extends Collection<Integer>> ret() {
-		return (Map<String, ? extends Collection<Integer>>) map;
-	}
+	
 	/**
 	 * Adds the location and word.
 	 *
@@ -136,7 +134,7 @@ public class TextFileIndex{
 	 * Returns the path of the word.
 	 * @param location word
 	 * @param loc path
-	 * @return the list
+	 * @return the listx`
 	 */
 	public Collection<Integer> get(String location, Path loc){
 		ArrayList<Integer> l=new ArrayList<Integer>();
