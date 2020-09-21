@@ -43,7 +43,7 @@ public class Driver {
 			
 		}
 		System.out.println("3 "+out);
-		if(!am.getPath("-path").toString().contains("\\")) {
+		if(!am.getPath("-path").toString().contains("/")) {
 			return;
 		}
 		System.out.println("4 "+out);
