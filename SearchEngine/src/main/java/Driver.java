@@ -28,13 +28,16 @@ public class Driver {
 		boolean singleFile=false;
 		Path out=null;
 		ArgumentMap am=new ArgumentMap(args);
-		
+		File f=new File("index.json");
 		
 		if(am.hasFlag("-path")==false&&am.hasFlag("-index")==true) {
 			System.out.println("TRAPPED!");
-			File f=new File("index.json");
+			//File f=new File("index.json");
 			f.mkdir();
 			return;
+		}
+		else if(f.exists()) {
+			f.delete();
 		}
 		if(args.length<2||am.hasFlag("-path")==false||am.getPath("-path")==null) {
 			return;
@@ -176,6 +179,7 @@ public class Driver {
 	
 		// output arguments
 		System.out.println(Arrays.toString(args));
+		
 		invertedIndex(args);
 		
 		// calculate time elapsed and output
