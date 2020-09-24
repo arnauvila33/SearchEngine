@@ -1,11 +1,11 @@
 name: Request Review
 
-#on:
- # workflow_dispatch:
-  #  inputs:
-   #   release:
-    #    description: 'Enter the release to have reviewed:'
-     #   required: true
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: 'Enter the release to have reviewed:'
+        required: true
 
 env:
   WORKFLOW: 'request-review.yml'
