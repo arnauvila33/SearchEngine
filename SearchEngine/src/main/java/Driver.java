@@ -23,7 +23,7 @@ public class Driver {
 	 * Used to deal with the unique cases
 	 * @param am ArgumentMap passed
 	 * @return boolean to see if it should stop the execution
-	 * @throws IOException exceptionn
+	 * @throws IOException exception
 	 */
 	private static boolean checkExceptions(ArgumentMap am) throws IOException {
 		
