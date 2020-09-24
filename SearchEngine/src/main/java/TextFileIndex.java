@@ -24,6 +24,7 @@ public class TextFileIndex{
 	 *
 	 * @param location the location the word was found
 	 * @param word the word foundd
+	 * @param pos position
 	 */
 	public void add(String location, String word,int pos) {
 		if(map.containsKey(word)) {
@@ -87,7 +88,8 @@ public class TextFileIndex{
 	 * stored for that location.
 	 *
 	 * @param location the location to lookup
-	 * @param word the word in that location to lookup
+	 * @param path the word in that location to lookup
+	 * 
 	 * @return {@true} if the location and word is stored in the index
 	 */
 	public boolean contains(String location, Path path) {

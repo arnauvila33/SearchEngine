@@ -83,7 +83,7 @@ public class SimpleJsonWriter {
 	 * @param m map passed
 	 * @param writer used
 	 * @param level to indent
-	 * @throws IOException
+	 * @throws IOException exception
 	 */
 	public static void invertedIndex(Map<String, TreeMap<String, ArrayList<Integer>>> m, Writer writer, int level)throws IOException {
 		indent(writer,level);
@@ -372,7 +372,7 @@ public class SimpleJsonWriter {
 	 * Writes the inverted index in a pretty json format to a file
 	 * @param elements map
 	 * @param path used
-	 * @throws IOException
+	 * @throws IOException exception
 	 */
 	public static void asinvertedIndex(Map<String, TreeMap<String, ArrayList<Integer>>> elements, Path path) throws IOException {
 		// THIS CODE IS PROVIDED FOR YOU; DO NOT MODIFY

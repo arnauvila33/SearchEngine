@@ -23,7 +23,7 @@ public class Driver {
 	 * Used to deal with the unique cases
 	 * @param am ArgumentMap passed
 	 * @return boolean to see if it should stop the execution
-	 * @throws IOException
+	 * @throws IOException exception
 	 */
 	private static boolean checkExceptions(ArgumentMap am) throws IOException {
 		
@@ -50,7 +50,7 @@ public class Driver {
 	/**
 	 * Main method for invertedIndex
 	 * @param args The arguments passed
-	 * @throws Exception
+	 * @throws Exception exception
 	 */
 	private static void invertedIndex(String[] args) throws Exception {
 		
@@ -89,7 +89,7 @@ public class Driver {
 	 * @param in path
 	 * @param out path
 	 * @param outputFile see if it should have output file or not
-	 * @throws IOException
+	 * @throws IOException excpetion
 	 */
 	private static void singleTxtPath(Path in,Path out,boolean outputFile) throws IOException {
 		ArrayList<String> input=TextFileStemmer.listStems(in);
@@ -111,7 +111,7 @@ public class Driver {
 	 * @param in path
 	 * @param out path
 	 * @param outputFile see if it should have an output file or not
-	 * @throws IOException
+	 * @throws IOException exception
 	 */
 	private static void directoryPath(Path in, Path out, boolean outputFile)throws IOException{
 		TextFileIndex txtF=new TextFileIndex();
@@ -137,7 +137,7 @@ public class Driver {
 	 * @param directory directory to look for
 	 * @param list list to keep all text files
 	 * @return the list with all the text files
-	 * @throws IOException
+	 * @throws IOException exception
 	 */
 	private static ArrayList<Path> traverseDirectory(Path directory, ArrayList<Path> list) throws IOException {
 		//ArrayList<Path> list=new ArrayList<>();
@@ -164,7 +164,7 @@ public class Driver {
 	 * inverted index.
 	 *
 	 * @param args flag/value pairs used to start this program
-	 * @throws Exception 
+	 * @throws Exception exception
 	 */
 	public static void main(String[] args) throws Exception {
 		// store initial start time
