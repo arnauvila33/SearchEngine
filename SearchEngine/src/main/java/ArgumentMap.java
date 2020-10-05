@@ -20,8 +20,7 @@ public class ArgumentMap {
 	/**
 	 * Initializes this argument map.
 	 */
-	public ArgumentMap() {
-		// TODO Properly initialize map below
+	public ArgumentMap() { 
 		this.map = new HashMap<String, String>() ;
 	}
 
@@ -78,7 +77,7 @@ public class ArgumentMap {
 	
 	public static boolean isFlag(String arg) {
 		
-		// TODO Fill in isFlag method without looping
+		
 		if(arg==null||arg.length()<2)
 			return false;
 		if(arg.startsWith("-")) {
@@ -116,7 +115,6 @@ public class ArgumentMap {
 	 * @return number of unique flags
 	 */
 	public int numFlags() {
-		// TODO Fill in numFlags method without looping
 		return map.size();
 		//throw new UnsupportedOperationException("Not yet implemented.");
 	}
@@ -128,7 +126,7 @@ public class ArgumentMap {
 	 * @return {@code true} if the flag exists
 	 */
 	public boolean hasFlag(String flag) {
-		// TODO Fill in hasFlag method without looping
+		
 		if(map.containsKey(flag))
 			return true;
 		return false;
@@ -142,7 +140,7 @@ public class ArgumentMap {
 	 * @return {@code true} if the flag is mapped to a non-null value
 	 */
 	public boolean hasValue(String flag) {
-		// TODO Fill in hasValue method without looping
+		
 		if(hasFlag(flag)) {
 			if(map.get(flag)!=null)
 				return true;
@@ -165,7 +163,7 @@ public class ArgumentMap {
 			return map.get(flag);
 		}
 		return null;
-		// TODO Fill in get method without looping
+		// 
 		//throw new UnsupportedOperationException("Not yet implemented.");
 	}
 
@@ -179,7 +177,7 @@ public class ArgumentMap {
 	 *         value if there is no mapping
 	 */
 	public String getString(String flag, String defaultValue) {
-		// TODO Fill in getPath method without looping
+		
 		if(hasValue(flag))
 			return map.get(flag);
 		return defaultValue;
@@ -221,7 +219,7 @@ public class ArgumentMap {
 	 *         default value if there is no valid mapping
 	 */
 	public Path getPath(String flag, Path defaultValue) {
-		// TODO Fill in getPath method without looping
+		
 		if(getPath(flag)==null)
 			return defaultValue;
 		return getPath(flag);
@@ -240,7 +238,7 @@ public class ArgumentMap {
 	 *         value if there is no valid mapping
 	 */
 	public int getInteger(String flag, int defaultValue) {
-		// TODO Fill in getInteger method without looping
+		// 
 		if(hasValue(flag)) {
 			return Integer.valueOf(map.get(flag));
 		}

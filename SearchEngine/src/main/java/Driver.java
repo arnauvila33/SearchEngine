@@ -185,11 +185,7 @@ public class Driver {
 	 */
 	public static void main(String[] args) throws Exception {
 		// store initial start time
-		Instant start = Instant.now();
-
-		// output arguments
-		System.out.println(Arrays.toString(args)); // TODO Remove debug output
-
+		Instant start = Instant.now();		
 		// calls main InvertedAxis method
 		invertedIndex(args);
 
