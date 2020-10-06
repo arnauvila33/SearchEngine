@@ -20,7 +20,7 @@ public class TextFileIndex{
 	
 	
 	/**
-	 * Adds the location and word.
+	 * Adds the location and word to map.
 	 *
 	 * @param location the location the word was found
 	 * @param word the word foundd

@@ -79,9 +79,9 @@ public class SimpleJsonWriter {
 	}
 	
 	/**
-	 * Writes invertedIndex in pretty json format
+	 * Writes invertedIndex in pretty json format.
 	 * @param m map passed
-	 * @param writer used
+	 * @param writer used to write in file.
 	 * @param level to indent
 	 * @throws IOException exception
 	 */
@@ -171,10 +171,7 @@ public class SimpleJsonWriter {
 		
 	}
 
-	/*
-	 * Todo: You are encouraged to include helper methods below. Here are a few
-	 * that you might find useful. Consider adding others as well.
-	 */
+
 
 	/**
 	 * Indents using a tab character by the number of times specified.

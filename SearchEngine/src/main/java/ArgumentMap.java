@@ -59,7 +59,7 @@ public class ArgumentMap {
 				map.put(args[i], null);
 			}
 		}
-		//throw new UnsupportedOperationException("Not yet implemented.");
+		
 	}
 
 	/**
@@ -116,7 +116,7 @@ public class ArgumentMap {
 	 */
 	public int numFlags() {
 		return map.size();
-		//throw new UnsupportedOperationException("Not yet implemented.");
+		
 	}
 
 	/**
@@ -130,7 +130,7 @@ public class ArgumentMap {
 		if(map.containsKey(flag))
 			return true;
 		return false;
-		//throw new UnsupportedOperationException("Not yet implemented.");
+		
 	}
 
 	/**
@@ -223,7 +223,6 @@ public class ArgumentMap {
 		if(getPath(flag)==null)
 			return defaultValue;
 		return getPath(flag);
-		//throw new UnsupportedOperationException("Not yet implemented.");
 	}
 
 	/**
@@ -243,7 +242,7 @@ public class ArgumentMap {
 			return Integer.valueOf(map.get(flag));
 		}
 		return defaultValue;
-		//throw new UnsupportedOperationException("Not yet implemented.");
+	
 	}
 
 	@Override
