@@ -32,6 +32,14 @@ public class InvertedIndex {
 	 * @throws IOException exception
 	 */
 	private static boolean checkExceptions(ArgumentMap argumentMap) throws IOException {
+		
+		//Unique Case to deal with an empty output
+		if(argumentMap.hasFlag("-path")==false&&argumentMap.hasFlag("-results")==true) {
+			TextFileIndex textFileIndex=new TextFileIndex();
+			SimpleJsonWriter.asinvertedIndex(textFileIndex.map,Paths.get("results.json"));
+			System.out.println("No input path given. Printed an empty file.");		
+			return false;
+		}
 
 		//Unique Case to deal with an empty output
 		if(argumentMap.hasFlag("-path")==false&&argumentMap.hasFlag("-index")==true) {
@@ -53,6 +61,16 @@ public class InvertedIndex {
 			System.out.println("Path given is not readable or does not exist.");	
 			return false;
 		}
+		
+		if(argumentMap.hasFlag("-queries")&&argumentMap.getPath("-queries")==null) {
+			System.out.println("Querie flag doesn't have a path associated with it.");
+			return false;
+		}
+		if(argumentMap.hasFlag("-queries")&&!Files.exists(argumentMap.getPath("-queries"))) {
+			System.out.println("Querie flag has an invalid path");
+			return false;
+		}
+		
 		return true;
 
 	}
@@ -80,19 +98,11 @@ public class InvertedIndex {
 			return;
 		}
 		
-		boolean count=false;
-		boolean exact=false;
-		boolean results=false;
 		boolean queries=true;
 		if(!argumentMap.hasFlag("-queries")) {
 			queries=false;
 		}
-		if(argumentMap.hasFlag("-counts"))
-			count=true;
-		if(argumentMap.hasFlag("-exact"))
-			exact=true;
-		if(argumentMap.hasFlag("-results"))
-			results=true;
+	
 		TextFileIndex textFileIndex;
 			if(!argumentMap.hasFlag("-index")){
 				isOutput=false;
@@ -107,6 +117,8 @@ public class InvertedIndex {
 			else {
 				textFileIndex=computeDirectory(argumentMap.getPath("-path"),outputFile,isOutput);
 			}
+			
+			
 			if(queries) {
 				processQuerie(argumentMap.getPath("-queries"),textFileIndex);
 			}
@@ -118,7 +130,12 @@ public class InvertedIndex {
 	}
 
 	 
-	
+	/**
+	 * process Querie
+	 * @param querie
+	 * @param textFileIndex
+	 * @throws IOException
+	 */
 	
 	private static void processQuerie(Path querie,TextFileIndex textFileIndex) throws IOException {
 		Map<String, ArrayList<SingleQuerie>> querieSearchList=new TreeMap<String, ArrayList<SingleQuerie>>();
@@ -137,17 +154,37 @@ public class InvertedIndex {
 			}
 			String QuerieString=String.join(" ",list);
 			ArrayList<SingleQuerie> queries=new ArrayList<SingleQuerie>();
-			queries=exactSearch(list,textFileIndex);
-			if(argumentMap.hasFlag("-exact")&&list.size()!=0)
+			
+			if(argumentMap.hasFlag("-exact")&&list.size()!=0) {
+				queries=exactSearch(list,textFileIndex);
 				querieSearchList.put(QuerieString, queries);
+			}
+			else if(list.size()!=0) {
+				queries=partialSearch(list,textFileIndex);				
+				querieSearchList.put(QuerieString, queries);
+			}
+			
+				
 		}
-		if(argumentMap.hasFlag("-results"))
-			SimpleJsonWriter.asNestedObject(querieSearchList,argumentMap.getPath("-results"));
+		if(argumentMap.hasFlag("-results")) {
+			if(argumentMap.getPath("-results")==null) {
+				Files.deleteIfExists(Paths.get("results.json"));
+				SimpleJsonWriter.asNestedObject(querieSearchList,Paths.get("results.json"));
+			}
+			else
+				SimpleJsonWriter.asNestedObject(querieSearchList,argumentMap.getPath("-results"));
+		}
+		
 		
 	}
 	
+	/**
+	 * orderQuerieList
+	 * @param list list of SingleQuerie objects to sort based on SingleQuerie.compareTo
+	 * @return returns the ordered list
+	 */
 	private static ArrayList<SingleQuerie> orderQuerieList(ArrayList<SingleQuerie> list){
-		boolean sorting=true;
+		
 		SingleQuerie temp;
 		for(int j=0;j<list.size();j++) {
 			
@@ -163,7 +200,57 @@ public class InvertedIndex {
 		
 		return list;
 	}
-	private static ArrayList<SingleQuerie> exactSearch(ArrayList<String> querie,TextFileIndex txtfi) {
+	
+	/**
+	 * This function does a partial search on the querie of words given. It uses the inverted index structure 
+	 * for better performance.
+	 * @param querie
+	 * @param textFileIndex
+	 * @return
+	 */
+	private static ArrayList<SingleQuerie> partialSearch(ArrayList<String> querie,TextFileIndex textFileIndex) {
+		ArrayList<SingleQuerie> querieResults=new ArrayList<SingleQuerie>(); 
+		ArrayList<Path> foundpaths=new ArrayList<Path>();
+		if(querie.size()<1) {
+			return querieResults;
+		}
+		int countt=0;
+		
+		while(countt<querie.size()) {
+			Collection<Collection<Path>> pathss=textFileIndex.getPartial(querie.get(countt++));
+			
+			for(Collection<Path> listOfWords:pathss) {
+				
+				
+				for(Path path:listOfWords) {
+					
+					if(!foundpaths.contains(path)) {
+						int count=0;
+						foundpaths.add(path);
+						String where=path.toString();
+
+						for(String words:querie) {		
+							Collection<String> fullWords=textFileIndex.getPartialWords(words);
+							for(String fullWord:fullWords) {
+								count+=textFileIndex.get(fullWord,path).size();	
+							}
+					
+						}
+						double score=(double)count/(double)countmap.get(path.toString());
+						SingleQuerie querieTemp=new SingleQuerie(where,count,score);
+						querieResults.add(querieTemp);
+	
+					}
+					
+				}
+				
+			}
+		}
+		querieResults=orderQuerieList(querieResults);
+		return querieResults;
+		
+	}
+	private static ArrayList<SingleQuerie> exactSearch(ArrayList<String> querie,TextFileIndex textFileIndex) {
 		ArrayList<SingleQuerie> querieResults=new ArrayList<SingleQuerie>(); 
 		ArrayList<Path> foundpaths=new ArrayList<Path>();
 		if(querie.size()<1) {
@@ -172,7 +259,7 @@ public class InvertedIndex {
 		int countt=0;
 		//Collection<Path> paths=txtfi.get(querie.get(0));
 		while(countt<querie.size()) {
-			Collection<Path> pathss=txtfi.get(querie.get(countt++));
+			Collection<Path> pathss=textFileIndex.get(querie.get(countt++));
 		
 		for(Path path:pathss) {
 			if(!foundpaths.contains(path)) {
@@ -183,8 +270,8 @@ public class InvertedIndex {
 			
 			int validPath=0;
 			for(String words:querie) {			
-				if(txtfi.get(words).contains(path)) {
-					count+=txtfi.get(words,path).size();
+				if(textFileIndex.get(words).contains(path)) {
+					count+=textFileIndex.get(words,path).size();
 				}
 				validPath++;
 			}

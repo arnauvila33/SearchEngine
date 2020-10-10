@@ -133,17 +133,31 @@ public class TextFileIndex{
 		return set;
 	}
 	
-	public Collection<Collection<Path>> getPartial(String location){
-	HashSet<Collection<Path>> set=new HashSet<Collection<Path>>();
+	public Collection< Collection<Path>> getPartial(String location){
+		HashSet<Collection<Path>> set=new HashSet<Collection<Path>>();
 		Iterator<?> ite=map.entrySet().iterator();
 		while(ite.hasNext()) {
 			String key=((Map.Entry)ite.next()).getKey().toString();
 			if(key.startsWith(location)) {
 				HashSet<Path> l=new HashSet<Path>();
-				Iterator<?> it=map.get(location).entrySet().iterator();
+				Iterator<?> it=map.get(key).entrySet().iterator();
 				while(it.hasNext())
 					l.add(Paths.get((String)((Map.Entry)it.next()).getKey()));
 				set.add(l);
+			}
+		}
+		 
+		return set;
+	}
+	
+	public Collection< String> getPartialWords(String location){
+		HashSet<String> set=new HashSet<String>();
+		Iterator<?> ite=map.entrySet().iterator();
+		while(ite.hasNext()) {
+			String key=((Map.Entry)ite.next()).getKey().toString();
+			if(key.startsWith(location)) {
+			
+				set.add(key);
 			}
 		}
 		 
