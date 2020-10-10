@@ -1,4 +1,5 @@
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -127,8 +128,25 @@ public class TextFileIndex{
 		if(map.containsKey(location)) {
 			Iterator<?> it=map.get(location).entrySet().iterator();
 			while(it.hasNext())
-				set.add((Path)((Map.Entry)it.next()).getKey());
-		}		
+				set.add(Paths.get((String)((Map.Entry)it.next()).getKey()));
+		}		 
+		return set;
+	}
+	
+	public Collection<Collection<Path>> getPartial(String location){
+	HashSet<Collection<Path>> set=new HashSet<Collection<Path>>();
+		Iterator<?> ite=map.entrySet().iterator();
+		while(ite.hasNext()) {
+			String key=((Map.Entry)ite.next()).getKey().toString();
+			if(key.startsWith(location)) {
+				HashSet<Path> l=new HashSet<Path>();
+				Iterator<?> it=map.get(location).entrySet().iterator();
+				while(it.hasNext())
+					l.add(Paths.get((String)((Map.Entry)it.next()).getKey()));
+				set.add(l);
+			}
+		}
+		 
 		return set;
 	}
 	
@@ -141,8 +159,8 @@ public class TextFileIndex{
 	public Collection<Integer> get(String location, Path loc){
 		ArrayList<Integer> l=new ArrayList<Integer>();
 		if(map.containsKey(location)) {
-			if(map.get(location).containsKey(loc)) {
-				return map.get(location).get(loc);					
+			if(map.get(location).containsKey(loc.toString())) {
+				return map.get(location).get(loc.toString());					
 			}
 		}
 		return l;

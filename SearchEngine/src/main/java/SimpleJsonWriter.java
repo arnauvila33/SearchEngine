@@ -61,12 +61,12 @@ public class SimpleJsonWriter {
 	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
 	 */
-	public static void asObject(Map<String, Integer> elements, Writer writer, int level) throws IOException {
+	public static <T> void asObject(Map<String, T> elements, Writer writer, int level) throws IOException {
 		
 		indent(writer,level);
 		writer.write("{");
 		int c=0;
-		for(Map.Entry<String, Integer> entry : elements.entrySet()) {
+		for(Map.Entry<String, T> entry : elements.entrySet()) {
 			c++;
 			writeEntry(entry, writer, 1);
 			if(c!=elements.size())
@@ -142,6 +142,74 @@ public class SimpleJsonWriter {
 			indent(entry.getKey(),writer,level+1);
 			writer.write(": ");
 			asArray(entry.getValue(), writer, level+1);
+			if(c!=elements.size())
+				writer.write(",");
+			writer.write("\n");
+			
+			
+		}
+		
+		writer.write("}");		
+	}
+	
+	
+
+	public static void asQuerie(SingleQuerie querie, Writer writer, int level) throws IOException {
+		indent(writer,level+1);
+		writer.write("{\n");
+		indent("where",writer,level+2);
+		writer.write(": ");
+		writer.write('"'+querie.where+'"');
+		writer.write(",\n");
+		indent("count",writer,level+2);
+		writer.write(": ");
+		writer.write(String.valueOf(querie.count));
+		writer.write(",\n");
+		indent("score",writer,level+2);
+		writer.write(": ");
+		writer.write(String.format("%.8f", querie.score));
+		writer.write("\n");
+		indent(writer,level+1);
+		writer.write("}");
+	}
+	/**
+	 * Writes the elements as a pretty JSON array.
+	 *
+	 * @param elements the elements to write
+	 * @param writer the writer to use
+	 * @param level the initial indent level
+	 * @throws IOException if an IO error occurs
+	 */
+	public static void asArrayQuerie(Collection<SingleQuerie> elements, Writer writer, int level) throws IOException {
+		
+		
+		writer.write("[");
+		writer.write("\n");
+		Iterator<SingleQuerie> it=elements.iterator();
+		int c=0;
+		for(SingleQuerie x:elements) {
+			c++;
+			asQuerie(x,writer,level);
+			//asObject(x.querie,writer,level+1);
+			if(c!=elements.size())
+				writer.write(",");
+			writer.write("\n");
+			
+		}
+		indent(writer,level);
+		writer.write("]");
+	}
+	public static void asNestedObject(Map<String, ? extends Collection<SingleQuerie>> elements, Writer writer, int level)
+			throws IOException {
+		indent(writer,level);
+		writer.write("{");
+		int c=0;
+		writer.write("\n");
+		for(Entry<String, ? extends Collection<SingleQuerie>> entry: elements.entrySet()) {
+			c++;
+			indent(entry.getKey(),writer,level+1);
+			writer.write(": ");
+			asArrayQuerie(entry.getValue(), writer, level+1);
 			if(c!=elements.size())
 				writer.write(",");
 			writer.write("\n");
@@ -227,12 +295,13 @@ public class SimpleJsonWriter {
 	 * @param level the initial indentation level
 	 * @throws IOException if an IO error occurs
 	 */
-	public static void writeEntry(Entry<String, Integer> entry, Writer writer, int level) throws IOException {
+	public static <T> void writeEntry(Entry<String, T> entry, Writer writer, int level) throws IOException {
 		writer.write('\n');
 		indent(entry.getKey(), writer, level);
 		writer.write(": ");
 		writer.write(entry.getValue().toString());
 	}
+	
 
 	
 	
@@ -375,6 +444,35 @@ public class SimpleJsonWriter {
 		// THIS CODE IS PROVIDED FOR YOU; DO NOT MODIFY
 		try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
 			invertedIndex(elements, writer, 0);
+		}
+	}
+	
+	/**
+	 * Returns inverted index in a pretty json format to string
+	 * @param elements map
+	 * @return string
+	 */
+	public static String asNestedObject(Map<String, ? extends Collection<SingleQuerie>> elements) {
+		// THIS CODE IS PROVIDED FOR YOU; DO NOT MODIFY
+		try {
+			StringWriter writer = new StringWriter();
+			asNestedObject(elements, writer, 0);
+			return writer.toString();
+		}
+		catch (IOException e) {
+			return null;
+		}
+	}
+	/**
+	 * Writes the inverted index in a pretty json format to a file
+	 * @param elements map
+	 * @param path used
+	 * @throws IOException exception
+	 */
+	public static void asNestedObject(Map<String, ? extends Collection<SingleQuerie>> elements, Path path) throws IOException {
+		// THIS CODE IS PROVIDED FOR YOU; DO NOT MODIFY
+		try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
+			asNestedObject(elements, writer, 0);
 		}
 	}
 
