@@ -95,8 +95,6 @@ public class SimpleJsonWriter {
 			c++;
 			indent(entry.getKey(),writer,level+1);
 			writer.write(": {");
-			//asArray(entry.getValue(), writer, level+1);
-			
 			writer.write("\n");
 			for(Entry<String, ArrayList<Integer>> ent: entry.getValue().entrySet()) {
 				c1++;
@@ -153,7 +151,13 @@ public class SimpleJsonWriter {
 	}
 	
 	
-
+	/**
+	 * Writes the querie as a pretty json file
+	 * @param querie the querie object to write
+	 * @param writer the writer used
+	 * @param level the indent level passed
+	 * @throws IOException exception
+	 */
 	public static void asQuerie(SingleQuerie querie, Writer writer, int level) throws IOException {
 		indent(writer,level+1);
 		writer.write("{\n");
@@ -181,8 +185,7 @@ public class SimpleJsonWriter {
 	 * @throws IOException if an IO error occurs
 	 */
 	public static void asArrayQuerie(Collection<SingleQuerie> elements, Writer writer, int level) throws IOException {
-		
-		
+	
 		writer.write("[");
 		writer.write("\n");
 		Iterator<SingleQuerie> it=elements.iterator();
@@ -190,7 +193,6 @@ public class SimpleJsonWriter {
 		for(SingleQuerie x:elements) {
 			c++;
 			asQuerie(x,writer,level);
-			//asObject(x.querie,writer,level+1);
 			if(c!=elements.size())
 				writer.write(",");
 			writer.write("\n");
@@ -199,6 +201,14 @@ public class SimpleJsonWriter {
 		indent(writer,level);
 		writer.write("]");
 	}
+	
+	/**
+	 * Writes the Querie search as a pretty JSON file
+	 * @param elements the data structure that holds the querie results
+	 * @param writer the writer used
+	 * @param level the indent level
+	 * @throws IOException exception
+	 */
 	public static void asNestedObject(Map<String, ? extends Collection<SingleQuerie>> elements, Writer writer, int level)
 			throws IOException {
 		indent(writer,level);
@@ -218,25 +228,6 @@ public class SimpleJsonWriter {
 		}
 		
 		writer.write("}");
-
-		/*
-		 * 
-		 *
-		 * The parameter syntax for elements looks like:
-		 *
-		 * Map<String, ? extends Collection<Integer>> elements
-		 *
-		 * The syntax above makes this method directly useful for your project.
-		 * However, you may not know how to interpret this syntax yet. It behaves
-		 * as if it were this instead:
-		 *
-		 * HashMap<String, HashSet<Integer>> elements
-		 *
-		 * You may want to use the "var" keyword here to make dealing with the syntax
-		 * a little bit easier.
-		 */
-
-		
 	}
 
 
@@ -450,7 +441,7 @@ public class SimpleJsonWriter {
 	/**
 	 * Returns inverted index in a pretty json format to string
 	 * @param elements map
-	 * @return string
+	 * @return string 
 	 */
 	public static String asNestedObject(Map<String, ? extends Collection<SingleQuerie>> elements) {
 		// THIS CODE IS PROVIDED FOR YOU; DO NOT MODIFY

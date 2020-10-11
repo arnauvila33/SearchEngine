@@ -9,16 +9,26 @@ public class SingleQuerie{
 	
 	Map<String,Object> querie=new HashMap<String,Object>();
 	
-	public SingleQuerie(String wher, int coun, double scor) {
-		where=wher;
-		count=coun;
-		score=scor;
+	/**
+	 * Constructor method 
+	 * @param where the path
+	 * @param count the count of words
+	 * @param score the score 
+	 */
+	public SingleQuerie(String where, int count, double score) {
+		this.where=where;
+		this.count=count;
+		this.score=score;
 		querie.put("where: ", where);
 		querie.put("count: ",  count);
 		querie.put("cvore: ", score);
 	}
 	
-
+	/**
+	 * CompareTo method adapted to the class
+	 * @param list the list to compare to
+	 * @return The int used to sort
+	 */
 	public int compareTo(SingleQuerie list) {
 		if(Double.compare(score, list.score)!=0)
 			return Double.compare(score, list.score);
@@ -29,9 +39,6 @@ public class SingleQuerie{
 		return 0;
 	}
 	
-	public String print() {
-		return where+"\n"+count+"\n"+score+"\n";
-	}
 
 
 	

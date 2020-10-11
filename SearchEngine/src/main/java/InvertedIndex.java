@@ -131,10 +131,10 @@ public class InvertedIndex {
 
 	 
 	/**
-	 * process Querie
-	 * @param querie
-	 * @param textFileIndex
-	 * @throws IOException
+	 * process Querie processes the querie passed and processes results
+	 * @param querie the querie path
+	 * @param textFileIndex the inverted index structure used
+	 * @throws IOException exception
 	 */
 	
 	private static void processQuerie(Path querie,TextFileIndex textFileIndex) throws IOException {
@@ -179,7 +179,7 @@ public class InvertedIndex {
 	}
 	
 	/**
-	 * orderQuerieList
+	 * orderQuerieList by bubble sort
 	 * @param list list of SingleQuerie objects to sort based on SingleQuerie.compareTo
 	 * @return returns the ordered list
 	 */
@@ -204,9 +204,9 @@ public class InvertedIndex {
 	/**
 	 * This function does a partial search on the querie of words given. It uses the inverted index structure 
 	 * for better performance.
-	 * @param querie
-	 * @param textFileIndex
-	 * @return
+	 * @param querie the querie passed to search
+	 * @param textFileIndex the inverted index structure used
+	 * @return the list with all the querie results ordered.
 	 */
 	private static ArrayList<SingleQuerie> partialSearch(ArrayList<String> querie,TextFileIndex textFileIndex) {
 		ArrayList<SingleQuerie> querieResults=new ArrayList<SingleQuerie>(); 
@@ -250,6 +250,12 @@ public class InvertedIndex {
 		return querieResults;
 		
 	}
+	/**
+	 * ExactSearch method that looks into the inverted index to search for the querie.
+	 * @param querie the querie passed to search
+	 * @param textFileIndex the inverted index structure used
+	 * @return the list with all the querie results ordered
+	 */
 	private static ArrayList<SingleQuerie> exactSearch(ArrayList<String> querie,TextFileIndex textFileIndex) {
 		ArrayList<SingleQuerie> querieResults=new ArrayList<SingleQuerie>(); 
 		ArrayList<Path> foundpaths=new ArrayList<Path>();
@@ -257,7 +263,6 @@ public class InvertedIndex {
 			return querieResults;
 		}
 		int countt=0;
-		//Collection<Path> paths=txtfi.get(querie.get(0));
 		while(countt<querie.size()) {
 			Collection<Path> pathss=textFileIndex.get(querie.get(countt++));
 		
@@ -351,13 +356,17 @@ public class InvertedIndex {
 		printCount();
 		if(printOutput) {
 			SimpleJsonWriter.asinvertedIndex(textFileInd.map,outputPath.normalize());
-		}
+		} 
 		else if(argumentMap.getPath("-path").toString().equals("input/text/simple")&&argumentMap.hasFlag("-exact")){
 			Files.delete(Paths.get("inverted.txt").normalize());
 			SimpleJsonWriter.asinvertedIndex(textFileInd.map,Paths.get("inverted.txt").normalize());
 		}
 	}
 	
+	/**
+	 * This function outputs the count to the counts path
+	 * @throws IOException exception
+	 */
 	private static void printCount() throws IOException {
 		if(argumentMap.hasFlag("-counts"))
 			SimpleJsonWriter.asObject(countmap,argumentMap.getPath("-counts").normalize());
