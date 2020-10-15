@@ -15,7 +15,7 @@ public class ArgumentMap {
 	/**
 	 * Stores command-line arguments in key = value pairs.
 	 */
-	private final Map<String, String> map;
+	private static Map<String, String> map;
 
 	/**
 	 * Initializes this argument map.
