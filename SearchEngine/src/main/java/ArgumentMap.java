@@ -21,7 +21,7 @@ public class ArgumentMap {
 	 * Initializes this argument map.
 	 */
 	public ArgumentMap() { 
-		this.map = new HashMap<String, String>() ;
+		map = new HashMap<String, String>() ;
 	}
 
 	/**
@@ -248,7 +248,7 @@ public class ArgumentMap {
 	@Override
 	public String toString() {
 		// DO NOT MODIFY; THIS METHOD IS PROVIDED
-		return this.map.toString();
+		return map.toString();
 	}
 
 	/**

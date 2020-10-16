@@ -5,9 +5,18 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
+/**
+ * Inverted Inex class builds an inverted index data structure.
+ * @author Arnau Vila
+ *
+ */
 public class InvertedIndex {
 	
+	/**
+	 * ArgumentMap used.
+	 */
 	private static ArgumentMap argumentMap;
+	
 	/**
 	 * Used to deal with the unique cases
 	 * @return boolean to see if it should stop the execution
@@ -39,8 +48,6 @@ public class InvertedIndex {
 
 	}
 
-	// TODO Use Java naming conventions (avoid abbreviations, camel case, etc.)
-	// TODO Also format code
 
 	/**
 	 * Main method for invertedIndex. Processes the path and index given, and calls the functions needed.
