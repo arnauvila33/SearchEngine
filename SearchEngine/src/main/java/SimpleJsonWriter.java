@@ -13,6 +13,13 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+/*
+ * TODO Try to refactor this code so that it is more general and efficient 
+ * using the approach at:
+ * 
+ * https://piazza.com/class/kdw23x4qxws3oz?cid=411
+ */
+
 /**
  * Outputs several simple data structures in "pretty" JSON format where newlines
  * are used to separate elements and nested elements are indented using tabs.
@@ -96,6 +103,8 @@ public class SimpleJsonWriter {
 			indent(entry.getKey(),writer,level+1);
 			writer.write(": {");
 			//asArray(entry.getValue(), writer, level+1);
+			
+			// TODO This should use asNestedArray
 			
 			writer.write("\n");
 			for(Entry<String, ArrayList<Integer>> ent: entry.getValue().entrySet()) {
