@@ -2,6 +2,12 @@ import java.text.Normalizer;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
+/*
+ * TODO Do a cleanup pass making sure the formatting looks good,
+ * removing the old main methods and any unnecessary comments, variable names,
+ * etc. all the little stuff.
+ */
+
 /**
  * Utility class for parsing text in a consistent manner.
  *
@@ -50,7 +56,7 @@ public class TextParser {
 	 * @see #clean(String)
 	 * @see #parse(String)
 	 */
-	public static String[] parse(String text) {
+	public static String[] parse(String text) { // TODO Clean up these comments and fix up formatting
 		/*
 		 * 
 		 * - calling clean(...) then split(...)
@@ -63,6 +69,9 @@ public class TextParser {
 		return res;
 	}
 
+	/*
+	 * TODO Can now clean up old main methods from homework. 
+	 */
 	/**
 	 * A simple main method that demonstrates this class.
 	 *

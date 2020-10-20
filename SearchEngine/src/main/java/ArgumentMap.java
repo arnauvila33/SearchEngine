@@ -15,7 +15,7 @@ public class ArgumentMap {
 	/**
 	 * Stores command-line arguments in key = value pairs.
 	 */
-	private static Map<String, String> map;
+	private static Map<String, String> map; // TODO Don't usually want static data, this should be final instead
 
 	/**
 	 * Initializes this argument map.
@@ -59,7 +59,18 @@ public class ArgumentMap {
 				map.put(args[i], null);
 			}
 		}
-		
+		/* TODO 
+		for(int i = 0; i < args.length; i++) {
+			if (isFlag(args[i])) {
+				if (i != args.length - 1 && isValue(args[i + 1])) {
+					map.put(args[i], args[i + 1]);
+				}
+				else {
+					map.put(args[i], null);
+				}
+			}
+		}
+		*/
 	}
 
 	/**
@@ -76,7 +87,7 @@ public class ArgumentMap {
 	 */
 	
 	public static boolean isFlag(String arg) {
-		
+		// TODO return arg != null && arg.length() >= 2 && arg.startsWith("-") && !Character.isDigit(arg.charAt(1));
 		
 		if(arg==null||arg.length()<2)
 			return false;
@@ -127,7 +138,7 @@ public class ArgumentMap {
 	 */
 	public boolean hasFlag(String flag) {
 		
-		if(map.containsKey(flag))
+		if(map.containsKey(flag)) // TODO Single return statement
 			return true;
 		return false;
 		
@@ -142,7 +153,7 @@ public class ArgumentMap {
 	public boolean hasValue(String flag) {
 		
 		if(hasFlag(flag)) {
-			if(map.get(flag)!=null)
+			if(map.get(flag)!=null) // TODO Single return
 				return true;
 			return false;
 		}

@@ -47,8 +47,22 @@ public class TextFileStemmer {
 		}
 		return list;
 		
-		
+		/* TODO
+		ArrayList<String> list = new ArrayList<String>();
+		stemIntoCollection(line, stemmer, list);
+		return list;
+		*/
 	}
+	
+	/* TODO
+	private static void stemIntoCollection(String line, Stemmer stemmer, Collection<String> container) {
+		String[] words = TextParser.parse(line);
+	
+		for(String word : words) {
+			container.add(stemmer.stem(word).toString());
+		}
+	}
+	*/
 
 	/**
 	 * Returns a list of cleaned and stemmed words parsed from the provided line
@@ -91,11 +105,23 @@ public class TextFileStemmer {
 		String line=null;
 		while ((line = reader.readLine()) != null) {
 			
-			list.addAll(listStems(line));
+			list.addAll(listStems(line)); // TODO Efficiency issue
 			
 		}
 		}
 		return list;
+		
+		/* TODO 
+		ArrayList<String> list = new ArrayList<String>();
+		Stemmer stemmer = 
+		try (BufferedReader reader = Files.newBufferedReader(inputFile, StandardCharsets.UTF_8);) {
+			String line = null;
+			while ((line = reader.readLine()) != null) {
+				stemIntoCollection(line, stemmer, list);
+			}
+		}
+		return list;
+		*/
 	}
 
 	/**
@@ -110,6 +136,11 @@ public class TextFileStemmer {
 	 * @see #uniqueStems(String, Stemmer)
 	 */
 	public static TreeSet<String> uniqueStems(String line) {
+		/* TODO 
+		TreeSet<String> set = new TreeSet<String>();
+		stemIntoCollection(line, stemmer, set);
+		return set;
+		*/
 	
 		TreeSet<String> set=arrayToSet(listStems(line));
 		return set;
@@ -149,6 +180,7 @@ public class TextFileStemmer {
 		return set;
 	}
 	
+	// TODO Efficiency issue, remove
 	/**
 	 * Transforms an arrayList to a treeSet
 	 * 
