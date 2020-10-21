@@ -1,12 +1,5 @@
 import java.text.Normalizer;
-import java.util.Arrays;
 import java.util.regex.Pattern;
-
-/*
- * TODO Do a cleanup pass making sure the formatting looks good,
- * removing the old main methods and any unnecessary comments, variable names,
- * etc. all the little stuff.
- */
 
 /**
  * Utility class for parsing text in a consistent manner.
@@ -24,8 +17,8 @@ public class TextParser {
 
 	/**
 	 * Cleans the text by removing any non-alphabetic characters (e.g. non-letters
-	 * like digits, punctuation, symbols, and diacritical marks like the umlaut)
-	 * and converting the remaining characters to lowercase.
+	 * like digits, punctuation, symbols, and diacritical marks like the umlaut) and
+	 * converting the remaining characters to lowercase.
 	 *
 	 * @param text the text to clean
 	 * @return cleaned text
@@ -56,32 +49,10 @@ public class TextParser {
 	 * @see #clean(String)
 	 * @see #parse(String)
 	 */
-	public static String[] parse(String text) { // TODO Clean up these comments and fix up formatting
-		/*
-		 * 
-		 * - calling clean(...) then split(...)
-		 * - calling split(...) then clean(...)
-		 * Choose the option that does not generate empty strings.
-		 */
-	
-		text=clean(text);
-		String[] res=split(text);
+	public static String[] parse(String text) {
+		text = clean(text);
+		String[] res = split(text);
 		return res;
 	}
 
-	/*
-	 * TODO Can now clean up old main methods from homework. 
-	 */
-	/**
-	 * A simple main method that demonstrates this class.
-	 *
-	 * @param args unused
-	 */
-	public static void main(String[] args) {
-		String text = "Sally Sue...\t sells 76 sea-shells    at THE sEa_shorE soirée!";
-
-		System.out.println("clean: " + clean(text));
-		System.out.println("split: " + Arrays.toString(split(text)));
-		System.out.println("parse: " + Arrays.toString(parse(text)));
-	}
 }

@@ -1,154 +1,204 @@
-import java.io.IOException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
- * Inverted Inex class builds an inverted index data structure.
- * @author Arnau Vila
+ * A special type of {@link SimpleIndex} that indexes the UNIQUE words that were
+ * found in a text file.
  *
+ * @author CS 212 Software Development
+ * @author University of San Francisco
+ * @version Fall 2020
  */
 public class InvertedIndex {
-	
-	/**
-	 * ArgumentMap used.
-	 */
-	private static ArgumentMap argumentMap;
-	
-	/**
-	 * Used to deal with the unique cases
-	 * @return boolean to see if it should stop the execution
-	 * @throws IOException exception
-	 */
-	private static boolean checkExceptions() throws IOException {
 
-		//Unique Case to deal with an empty output
-		if(argumentMap.hasFlag("-path")==false&&argumentMap.hasFlag("-index")==true) {
-			TextFileIndex textFileIndex=new TextFileIndex();
-			SimpleJsonWriter.asinvertedIndex(textFileIndex.map,Paths.get("index.json"));
-			System.out.println("No input path given. Printed an empty file.");		
-			return false;
-		}
-
-		//If there is no input path
-		if(argumentMap.hasFlag("-path")==false||argumentMap.getPath("-path")==null) {
-			System.out.println("No input path given.");	
-			return false;
-
-		}
-		
-		//If the path is not readable or non-existent
-		if(!Files.isReadable(argumentMap.getPath("-path"))&&!Files.exists(argumentMap.getPath("-path"))) {
-			System.out.println("Path given is not readable or does not exist.");	
-			return false;
-		}
-		return true;
-
-	}
-
+	/** map where values are stored */
+	private final Map<String, TreeMap<String, TreeSet<Integer>>> invertedIndex;
 
 	/**
-	 * Main method for invertedIndex. Processes the path and index given, and calls the functions needed.
-	 * @param args The arguments passed
-	 * @throws Exception exception
+	 * Constructor for Inverted Index
 	 */
-	public void makeInvertedIndex(String[] args) throws Exception {
-		//ArgumentMap used to handle args
-		argumentMap=new ArgumentMap(args);
-
-		//Checks and deals the Unique cases
-		if(!checkExceptions()) {
-			System.out.println("Please try again with a valid path and index.");
-			return;
-		}
-		
-		
-		
-		TextFileIndex textFileIndex=new TextFileIndex();
-		if(argumentMap.getString("-path").toLowerCase().endsWith(".txt")||argumentMap.getString("-path").toLowerCase().endsWith(".text")||argumentMap.getString("-path").toLowerCase().endsWith(".md")){
-			computeSingleFile(argumentMap.getPath("-path"),textFileIndex);
-		}
-		else {
-			computeDirectory(argumentMap.getPath("-path"),textFileIndex);
-		}
-		printOutputFile(textFileIndex);
-
+	public InvertedIndex() {
+		invertedIndex = new TreeMap<String, TreeMap<String, TreeSet<Integer>>>();
 	}
 
 	/**
-	 * Used to compute a singleTxt file. 
-	 * @param inputPath the path of thew text file to compute.
-	 * @param textFileIndex the TextFileIndex used to write the invertedindex.
-	 * @throws IOException exception 
+	 * Adds the location and word to map.
+	 *
+	 * @param location the location the word was found
+	 * @param word     the word foundd
+	 * @param position position
 	 */
-	private static void computeSingleFile(Path inputPath, TextFileIndex textFileIndex) throws IOException {
-		ArrayList<String> input=TextFileStemmer.listStems(inputPath);
-		int i=1;
-	
-		for(String x:input) {
-			textFileIndex.add(inputPath.toString(), x, i++);
-		}
-	}
-
-	/**
-	 * Compute Directory computes the inputPath given. It calls functions as needed.
-	 * @param inputPath the path of thew text file to compute.
-	 * @param textFileIndex the TextFileIndex used to write the invertedindex.
-	 * @throws IOException exception
-	 */
-	private static void computeDirectory(Path inputPath, TextFileIndex textFileIndex)throws IOException{
-		ArrayList<Path> pathList=new ArrayList<Path>();
-		pathList=traverseDirectory(inputPath,pathList);
-
-		for(Path path:pathList) {
-			ArrayList<String> input=TextFileStemmer.listStems(path);
-			int i=1;
-			for(String x:input) {
-				textFileIndex.add(path.toString(), x, i++);
+	public void add(String location, String word, int position) {
+		if (invertedIndex.containsKey(word)) {
+			if (invertedIndex.get(word).containsKey(location)) {
+				invertedIndex.get(word).get(location).add(position);
+			} else {
+				TreeSet<Integer> list = new TreeSet<Integer>();
+				list.add(position);
+				invertedIndex.get(word).put(location, list);
 			}
-
+		} else {
+			TreeMap<String, TreeSet<Integer>> treeMap = new TreeMap<String, TreeSet<Integer>>();
+			TreeSet<Integer> list = new TreeSet<Integer>();
+			list.add(position);
+			treeMap.put(location, list);
+			invertedIndex.put(word, treeMap);
 		}
+
 	}
-	
+
 	/**
-	 * It prints the textFileIndex as an InvertedIndex in the outputPath if printOutput is true.
-	 * @param textFileInd the textFileIndex used to write to path.
-	 * @throws IOException exception
+	 * Determines whether the location is stored in the index.
+	 *
+	 * @param word the location to lookup
+	 * @return {@true} if the location is stored in the index
 	 */
-	private static void printOutputFile(TextFileIndex textFileInd) throws IOException {
-		Path outputFile;
-		if(argumentMap.hasFlag("-index")) {
-			if(argumentMap.getPath("-index")==null)
-				outputFile=argumentMap.getPath("-index",Paths.get("index.json"));
-			else {
-				outputFile=argumentMap.getPath("-index");
-			}
-			SimpleJsonWriter.asinvertedIndex(textFileInd.map,outputFile.normalize());
-		}
+	public boolean contains(String word) {
+		if (invertedIndex.isEmpty())
+			return false;
+		return invertedIndex.containsKey(word);
 	}
 
 	/**
-	 * Recursive function used to traverse all directories and find all .txt files.
+	 * Determines whether the word is stored in the index and the path is stored for
+	 * that word.
+	 *
+	 * @param word the location to lookup
+	 * @param path the word in that location to lookup
 	 * 
-	 * @param directory The path directory to look for text files.
-	 * @param list The list where all the text files are stored.
-	 * @return the list with all the text files found.
-	 * @throws IOException exception
+	 * @return {@true} if the location and word is stored in the index
 	 */
-	private static ArrayList<Path> traverseDirectory(Path directory, ArrayList<Path> list) throws IOException {
-		try (DirectoryStream<Path> listing = Files.newDirectoryStream(directory)) {
-			// use an enhanced-for or for-each loop for efficiency and simplicity
-			for (Path path : listing) {
-				if (Files.isDirectory(path)) {
-					traverseDirectory(path, list);
-				}else if(path.toString().toLowerCase().endsWith(".txt")||path.toString().toLowerCase().endsWith(".text")) {
-					list.add(path);
+	public boolean contains(String word, Path path) {
+		if (contains(word))
+			return invertedIndex.get(word).containsKey(path.toString());
+		return false;
+	}
+
+	/**
+	 * Determines whether the word is stored in the index, and the path is stored in
+	 * that word, and that the position is in that path.
+	 * 
+	 * @param word     to look
+	 * @param path     to look
+	 * @param position to look
+	 * @return {@true} if the location, word, and position is stored in the index
+	 */
+	public boolean contains(String word, Path path, int position) {
+		if (contains(word, path))
+			return invertedIndex.get(word).get(path.toString()).contains(position);
+		return false;
+	}
+
+	/**
+	 * Returns an unmodifiable view of the words stored in the index.
+	 *
+	 * @return an unmodifiable view of the locations stored in the index
+	 * @see Collections#unmodifiableCollection(Collection)
+	 */
+	public Collection<String> get() {
+		ArrayList<String> list = new ArrayList<String>();
+		Iterator<Entry<String, TreeMap<String, TreeSet<Integer>>>> it = invertedIndex.entrySet().iterator();
+		while (it.hasNext()) {
+			list.add((String) (it.next()).getKey());
+		}
+		return list;
+	}
+
+	/**
+	 * Returns a collection of paths for the word given.
+	 *
+	 * @param word the location to lookup
+	 * @return an unmodifiable view of the words stored for the location
+	 */
+	public Collection<Path> get(String word) {
+		ArrayList<Path> list = new ArrayList<Path>();
+		if (contains(word)) {
+			Iterator<Entry<String, TreeSet<Integer>>> iterator = invertedIndex.get(word).entrySet().iterator();
+			while (iterator.hasNext())
+				list.add(Paths.get((iterator.next()).getKey()));
+		}
+		return list;
+	}
+
+	/**
+	 * Returns the positions of the word in the path give.
+	 * 
+	 * @param word word to look for
+	 * @param path path to look for
+	 * @return the list of positions
+	 */
+	public Collection<Integer> get(String word, Path path) {
+		ArrayList<Integer> list = new ArrayList<Integer>();
+		if (contains(word, path)) {
+			Iterator<Integer> iterator = invertedIndex.get(word).get(path.toString()).iterator();
+			while (iterator.hasNext())
+				list.add(iterator.next());
+		}
+		return list;
+	}
+
+	/**
+	 * Returns the number of words stored in the index.
+	 *
+	 * @return 0 if the index is empty, otherwise the number of locations in the
+	 *         index
+	 */
+	public int size() {
+		return invertedIndex.size();
+	}
+
+	/**
+	 * Returns the number of paths stored for the given word.
+	 *
+	 * @param word the location to lookup
+	 * @return 0 if the location is not in the index or has no words, otherwise the
+	 *         number of words stored for that element
+	 */
+	public int size(String word) {
+		return get(word).size();
+	}
+
+	/**
+	 * Returns the number of positions in the path given for the word given.
+	 * 
+	 * @param word word to use to search
+	 * @param path to use to search
+	 * @return 0 if word or path are not present, or the actual size
+	 */
+	public int size(String word, Path path) {
+		return get(word, path).size();
+	}
+
+	/**
+	 * Returns the InvertedIndex structure
+	 * 
+	 * @return the inverted index map
+	 */
+	public Map<String, TreeMap<String, TreeSet<Integer>>> getMap() {
+		return Collections.unmodifiableMap(invertedIndex);
+	}
+
+	@Override
+	public String toString() {
+		Collection<String> words = get();
+		String result = "";
+		for (String word : words) {
+			result += word + ": ";
+			Collection<Path> paths = get(word);
+			for (Path path : paths) {
+				result += " " + path + ": ";
+				Collection<Integer> counts = get(word, path);
+				for (Integer count : counts) {
+					result += " " + count + "\t";
 				}
 			}
-			return list;
+			result += "\n";
 		}
+
+		return result;
+
 	}
 
 }
