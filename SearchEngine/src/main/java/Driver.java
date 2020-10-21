@@ -1,6 +1,12 @@
 import java.time.Duration;
 import java.time.Instant;
 
+/**
+ * Driver class to handle args
+ * 
+ * @author Arnau Vila
+ *
+ */
 public class Driver {
 
 	/**

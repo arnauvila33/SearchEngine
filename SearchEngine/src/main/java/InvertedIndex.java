@@ -101,7 +101,7 @@ public class InvertedIndex {
 		ArrayList<String> list = new ArrayList<String>();
 		Iterator<Entry<String, TreeMap<String, TreeSet<Integer>>>> it = invertedIndex.entrySet().iterator();
 		while (it.hasNext()) {
-			list.add((String) (it.next()).getKey());
+			list.add((it.next()).getKey());
 		}
 		return list;
 	}
