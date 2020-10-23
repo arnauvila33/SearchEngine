@@ -91,6 +91,7 @@ public class SimpleJsonWriter {
 	 */
 	public static void asNestedArray(Map<String, ? extends Collection<Integer>> elements, Writer writer, int level)
 			throws IOException {
+		// TODO Still need to do this: https://piazza.com/class/kdw23x4qxws3oz?cid=411
 		writer.write("{");
 		indent(writer, level);
 		int c = 0;
@@ -119,6 +120,8 @@ public class SimpleJsonWriter {
 	 */
 	public static void asInvertedIndex(Map<String, ? extends Map<String, ? extends Collection<Integer>>> invertedIndex,
 			Writer writer, int level) throws IOException {
+		// TODO Still need to do this: https://piazza.com/class/kdw23x4qxws3oz?cid=411
+		
 		indent(writer, level);
 		writer.write("{");
 		int c = 0;

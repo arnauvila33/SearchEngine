@@ -2,6 +2,8 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 
+// TODO Remove SimpleIndex from the project
+
 /**
  * An index to store locations and the words found at those locations. Makes no
  * assumption about order or duplicates.

@@ -53,6 +53,8 @@ public class TextParser {
 		text = clean(text);
 		String[] res = split(text);
 		return res;
+		
+		// TODO return split(clean(text));
 	}
 
 }
