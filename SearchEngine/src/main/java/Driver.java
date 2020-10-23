@@ -24,6 +24,21 @@ public class Driver {
 		// Used to calculate InvertedIndex
 		InvertedIndexBuilder invertedIndexBuilder = new InvertedIndexBuilder();
 		invertedIndexBuilder.makeInvertedIndex(args);
+		
+		/*
+		 * TODO The args should never leave Driver. 
+		 * 
+		 * ArgumentMap map = ...
+		 * InvertedIndex index = ...
+		 * 
+		 * if (map.has the path flag) {
+		 * 		build
+		 * }
+		 * 
+		 * if (map has the index flag) {
+		 * 		write
+		 * }
+		 */
 
 		// calculate time elapsed and output
 		Duration elapsed = Duration.between(start, Instant.now());
