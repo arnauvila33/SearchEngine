@@ -31,7 +31,7 @@ public class Driver {
 			new InvertedIndexBuilder(invertedIndex, argumentMap.getPath("-path"));
 		}
 		if (argumentMap.hasFlag("-index")) {
-			invertedIndex.toJson(argumentMap.getPath("-index",Paths.get("index.json")));
+			invertedIndex.toJson(argumentMap.getPath("-index", Paths.get("index.json")));
 		}
 
 		// calculate time elapsed and output

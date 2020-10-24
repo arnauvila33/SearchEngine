@@ -111,7 +111,7 @@ public class TextFileStemmer {
 	 * and then adds those words to a set.
 	 *
 	 * @param inputFile the input file to parse
-	 * @param list the Collection passed to stem
+	 * @param list      the Collection passed to stem
 	 * @throws IOException if unable to read or parse file
 	 *
 	 * @see #uniqueStems(String)

@@ -3,8 +3,8 @@ import java.nio.file.Path;
 import java.util.*;
 
 /**
- * A special type of simpleIndex that indexes the UNIQUE words that were
- * found in a text file.
+ * A special type of simpleIndex that indexes the UNIQUE words that were found
+ * in a text file.
  *
  * @author CS 212 Software Development
  * @author University of San Francisco
@@ -148,7 +148,7 @@ public class InvertedIndex {
 	 * @throws IOException exception
 	 */
 	public void toJson(Path path) throws IOException {
-			SimpleJsonWriter.asinvertedIndex(invertedIndex, path);
+		SimpleJsonWriter.asinvertedIndex(invertedIndex, path);
 	}
 
 	@Override
