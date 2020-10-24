@@ -1,3 +1,4 @@
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
 
@@ -30,7 +31,7 @@ public class Driver {
 			new InvertedIndexBuilder(invertedIndex, argumentMap.getPath("-path"));
 		}
 		if (argumentMap.hasFlag("-index")) {
-			invertedIndex.toJson(argumentMap.getPath("-index"));
+			invertedIndex.toJson(argumentMap.getPath("-index",Paths.get("index.json")));
 		}
 
 		// calculate time elapsed and output

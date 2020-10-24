@@ -143,15 +143,12 @@ public class InvertedIndex {
 	}
 
 	/**
-	 * Prints the invertedIndex to the path given or the default path "index.json".
+	 * Prints the invertedIndex to the path given
 	 * 
 	 * @param path the path to print the invertedIndex to
 	 * @throws IOException exception
 	 */
 	public void toJson(Path path) throws IOException {
-		if (path == null)
-			SimpleJsonWriter.asinvertedIndex(invertedIndex, Paths.get("index.json"));
-		else
 			SimpleJsonWriter.asinvertedIndex(invertedIndex, path);
 	}
 
