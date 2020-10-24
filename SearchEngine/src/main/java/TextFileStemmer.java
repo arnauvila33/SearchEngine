@@ -66,8 +66,8 @@ public class TextFileStemmer {
 	 * @see #listStems(String, Stemmer)
 	 */
 	public static ArrayList<String> listStems(String line) {
-		Stemmer st = new SnowballStemmer(DEFAULT);
-		ArrayList<String> list = listStems(line, st);
+		Stemmer stemmer = new SnowballStemmer(DEFAULT);
+		ArrayList<String> list = listStems(line, stemmer);
 		return list;
 	}
 

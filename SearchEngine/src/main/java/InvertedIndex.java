@@ -1,7 +1,7 @@
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * A special type of {@link SimpleIndex} that indexes the UNIQUE words that were
@@ -14,10 +14,7 @@ import java.util.Map.Entry;
 public class InvertedIndex {
 
 	/** map where values are stored */
-	private final Map<String, TreeMap<String, TreeSet<Integer>>> invertedIndex;
-	
-	// TODO 
-	// private final TreeMap<String, TreeMap<String, TreeSet<Integer>>> invertedIndex;
+	private final TreeMap<String, TreeMap<String, TreeSet<Integer>>> invertedIndex;
 
 	/**
 	 * Constructor for Inverted Index
@@ -26,36 +23,17 @@ public class InvertedIndex {
 		invertedIndex = new TreeMap<String, TreeMap<String, TreeSet<Integer>>>();
 	}
 
-	// TODO Swap the order of location and word (use Eclipse Refactor)
 	/**
 	 * Adds the location and word to map.
-	 *
-	 * @param location the location the word was found
+	 * 
 	 * @param word     the word foundd
+	 * @param location the location the word was found
 	 * @param position position
 	 */
-	public void add(String location, String word, int position) {
-		if (invertedIndex.containsKey(word)) {
-			if (invertedIndex.get(word).containsKey(location)) {
-				invertedIndex.get(word).get(location).add(position);
-			} else {
-				TreeSet<Integer> list = new TreeSet<Integer>();
-				list.add(position);
-				invertedIndex.get(word).put(location, list);
-			}
-		} else {
-			TreeMap<String, TreeSet<Integer>> treeMap = new TreeMap<String, TreeSet<Integer>>();
-			TreeSet<Integer> list = new TreeSet<Integer>();
-			list.add(position);
-			treeMap.put(location, list);
-			invertedIndex.put(word, treeMap);
-		}
-		
-		/* TODO 
+	public void add(String word, String location, int position) {
 		invertedIndex.putIfAbsent(word, new TreeMap<>());
 		invertedIndex.get(word).putIfAbsent(location, new TreeSet<>());
 		invertedIndex.get(word).get(location).add(position);
-		 */
 	}
 
 	/**
@@ -65,9 +43,8 @@ public class InvertedIndex {
 	 * @return {@true} if the location is stored in the index
 	 */
 	public boolean contains(String word) {
-		if (invertedIndex.isEmpty())
-			return false;
-		return invertedIndex.containsKey(word); // TODO Only line needed
+		return !invertedIndex.isEmpty() && invertedIndex.containsKey(word);
+
 	}
 
 	/**
@@ -79,11 +56,8 @@ public class InvertedIndex {
 	 * 
 	 * @return {@true} if the location and word is stored in the index
 	 */
-	public boolean contains(String word, Path path) { // TODO Path --> String
-		// TODO return contains(word) && invertedIndex.get(word).containsKey(path.toString());
-		if (contains(word))
-			return invertedIndex.get(word).containsKey(path.toString());
-		return false;
+	public boolean contains(String word, String path) {
+		return contains(word) && invertedIndex.get(word).containsKey(path.toString());
 	}
 
 	/**
@@ -95,10 +69,8 @@ public class InvertedIndex {
 	 * @param position to look
 	 * @return {@true} if the location, word, and position is stored in the index
 	 */
-	public boolean contains(String word, Path path, int position) { // TODO Fix
-		if (contains(word, path))
-			return invertedIndex.get(word).get(path.toString()).contains(position);
-		return false;
+	public boolean contains(String word, String path, int position) {
+		return contains(word, path) && invertedIndex.get(word).get(path.toString()).contains(position);
 	}
 
 	/**
@@ -108,14 +80,7 @@ public class InvertedIndex {
 	 * @see Collections#unmodifiableCollection(Collection)
 	 */
 	public Collection<String> get() {
-		ArrayList<String> list = new ArrayList<String>();
-		Iterator<Entry<String, TreeMap<String, TreeSet<Integer>>>> it = invertedIndex.entrySet().iterator();
-		while (it.hasNext()) {
-			list.add((it.next()).getKey());
-		}
-		return list;
-		
-		// TODO return Collections.unmodifiableCollection(invertedIndex.keySet());
+		return Collections.unmodifiableCollection(invertedIndex.keySet());
 	}
 
 	/**
@@ -124,21 +89,11 @@ public class InvertedIndex {
 	 * @param word the location to lookup
 	 * @return an unmodifiable view of the words stored for the location
 	 */
-	public Collection<Path> get(String word) {
-		/*
-		 * TODO
-		 * if (contains(word)) {
-		 * 	return the inner keyset as unmodifiable
-		 * }
-		 * else return Collections.emtpySet();
-		 */
-		ArrayList<Path> list = new ArrayList<Path>();
-		if (contains(word)) {
-			Iterator<Entry<String, TreeSet<Integer>>> iterator = invertedIndex.get(word).entrySet().iterator();
-			while (iterator.hasNext())
-				list.add(Paths.get((iterator.next()).getKey()));
-		}
-		return list;
+	public Collection<String> get(String word) {
+		if (contains(word))
+			return Collections.unmodifiableCollection(invertedIndex.get(word).keySet());
+		else
+			return Collections.emptySet();
 	}
 
 	/**
@@ -148,14 +103,11 @@ public class InvertedIndex {
 	 * @param path path to look for
 	 * @return the list of positions
 	 */
-	public Collection<Integer> get(String word, Path path) { // TODO Fix
-		ArrayList<Integer> list = new ArrayList<Integer>();
+	public Collection<Integer> get(String word, String path) {
 		if (contains(word, path)) {
-			Iterator<Integer> iterator = invertedIndex.get(word).get(path.toString()).iterator();
-			while (iterator.hasNext())
-				list.add(iterator.next());
-		}
-		return list;
+			return Collections.unmodifiableCollection(invertedIndex.get(word).get(path));
+		} else
+			return Collections.emptySet();
 	}
 
 	/**
@@ -186,48 +138,26 @@ public class InvertedIndex {
 	 * @param path to use to search
 	 * @return 0 if word or path are not present, or the actual size
 	 */
-	public int size(String word, Path path) {
+	public int size(String word, String path) {
 		return get(word, path).size();
 	}
 
-	// TODO Remove, breaks encapsulation
 	/**
-	 * Returns the InvertedIndex structure
+	 * Prints the invertedIndex to the path given or the default path "index.json".
 	 * 
-	 * @return the inverted index map
+	 * @param path the path to print the invertedIndex to
+	 * @throws IOException exception
 	 */
-	public Map<String, TreeMap<String, TreeSet<Integer>>> getMap() {
-		return Collections.unmodifiableMap(invertedIndex);
+	public void toJson(Path path) throws IOException {
+		if (path == null)
+			SimpleJsonWriter.asinvertedIndex(invertedIndex, Paths.get("index.json"));
+		else
+			SimpleJsonWriter.asinvertedIndex(invertedIndex, path);
 	}
-	
-	/*
-	 * TODO 
-	public void toJson(Path path) {
-		SimpleJsonWriter.asinvertedIndex(invertedIndex, path);
-	}
-	 */
-	
+
 	@Override
 	public String toString() {
-		// TODO Terrible... string concatenation
-		// TODO return invertedIndex.toString();
-		Collection<String> words = get();
-		String result = "";
-		for (String word : words) {
-			result += word + ": ";
-			Collection<Path> paths = get(word);
-			for (Path path : paths) {
-				result += " " + path + ": ";
-				Collection<Integer> counts = get(word, path);
-				for (Integer count : counts) {
-					result += " " + count + "\t";
-				}
-			}
-			result += "\n";
-		}
-
-		return result;
-
+		return invertedIndex.toString();
 	}
 
 }

@@ -21,24 +21,17 @@ public class Driver {
 		// store initial start time
 		Instant start = Instant.now();
 
-		// Used to calculate InvertedIndex
-		InvertedIndexBuilder invertedIndexBuilder = new InvertedIndexBuilder();
-		invertedIndexBuilder.makeInvertedIndex(args);
-		
-		/*
-		 * TODO The args should never leave Driver. 
-		 * 
-		 * ArgumentMap map = ...
-		 * InvertedIndex index = ...
-		 * 
-		 * if (map.has the path flag) {
-		 * 		build
-		 * }
-		 * 
-		 * if (map has the index flag) {
-		 * 		write
-		 * }
-		 */
+		// stores the args as flags
+		ArgumentMap argumentMap = new ArgumentMap(args);
+		// InvertedIndex object
+		InvertedIndex invertedIndex = new InvertedIndex();
+
+		if (argumentMap.hasFlag("-path")) {
+			new InvertedIndexBuilder(invertedIndex, argumentMap.getPath("-path"));
+		}
+		if (argumentMap.hasFlag("-index")) {
+			invertedIndex.toJson(argumentMap.getPath("-index"));
+		}
 
 		// calculate time elapsed and output
 		Duration elapsed = Duration.between(start, Instant.now());

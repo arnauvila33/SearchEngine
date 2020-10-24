@@ -10,10 +10,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-/*
- * TODO Ask about if statement on a nested data structure 
- */
-
 /**
  * Outputs several simple data structures in "pretty" JSON format where newlines
  * are used to separate elements and nested elements are indented using tabs.
@@ -36,16 +32,14 @@ public class SimpleJsonWriter {
 	 * @throws IOException if an IO error occurs
 	 */
 	public static void asArray(Collection<Integer> elements, Writer writer, int level) throws IOException {
-
 		writer.write("[");
-		writer.write("\n");
 		Iterator<Integer> it = elements.iterator();
 		if (it.hasNext()) {
+			writer.write("\n");
 			indent(it.next(), writer, level + 1);
 		}
 		while (it.hasNext()) {
-			writer.write(",");
-			writer.write("\n");
+			writer.write(",\n");
 			indent(it.next(), writer, level + 1);
 		}
 		writer.write("\n");
@@ -70,12 +64,10 @@ public class SimpleJsonWriter {
 			writeEntry(iterator.next(), writer, level);
 		}
 		while (iterator.hasNext()) {
-			writer.write(",");
-			writer.write("\n");
+			writer.write(",\n");
 			writeEntry(iterator.next(), writer, level);
 		}
-		writer.write("\n");
-		writer.write("}");
+		writer.write("\n}");
 
 	}
 
@@ -94,20 +86,23 @@ public class SimpleJsonWriter {
 		// TODO Still need to do this: https://piazza.com/class/kdw23x4qxws3oz?cid=411
 		writer.write("{");
 		indent(writer, level);
-		int c = 0;
-		writer.write("\n");
-		for (Entry<String, ? extends Collection<Integer>> entry : elements.entrySet()) {
-			c++;
+		var iterator = elements.entrySet().iterator();
+		Entry<String, ? extends Collection<Integer>> entry;
+		if (iterator.hasNext()) {
+			writer.write("\n");
+			entry = iterator.next();
 			indent(entry.getKey(), writer, level + 1);
 			writer.write(": ");
 			asArray(entry.getValue(), writer, level + 1);
-			if (c != elements.size())
-				writer.write(",");
-			writer.write("\n");
-
 		}
-
-		writer.write("}");
+		while (iterator.hasNext()) {
+			writer.write(",\n");
+			entry = iterator.next();
+			indent(entry.getKey(), writer, level + 1);
+			writer.write(": ");
+			asArray(entry.getValue(), writer, level + 1);
+		}
+		writer.write("\n}");
 	}
 
 	/**
@@ -121,22 +116,27 @@ public class SimpleJsonWriter {
 	public static void asInvertedIndex(Map<String, ? extends Map<String, ? extends Collection<Integer>>> invertedIndex,
 			Writer writer, int level) throws IOException {
 		// TODO Still need to do this: https://piazza.com/class/kdw23x4qxws3oz?cid=411
-		
+
 		indent(writer, level);
 		writer.write("{");
-		int c = 0;
-		writer.write("\n");
-		for (Entry<String, ? extends Map<String, ? extends Collection<Integer>>> entry : invertedIndex.entrySet()) {
-			c++;
+		var iterator = invertedIndex.entrySet().iterator();
+		Entry<String, ? extends Map<String, ? extends Collection<Integer>>> entry;
+		if (iterator.hasNext()) {
+			writer.write("\n");
+			entry = iterator.next();
 			indent(entry.getKey(), writer, level + 1);
 			writer.write(": ");
 			asNestedArray(entry.getValue(), writer, level + 1);
-			if (c != invertedIndex.size())
-				writer.write(",");
-			writer.write("\n");
+		}
+		while (iterator.hasNext()) {
+			writer.write(",\n");
+			entry = iterator.next();
+			indent(entry.getKey(), writer, level + 1);
+			writer.write(": ");
+			asNestedArray(entry.getValue(), writer, level + 1);
 		}
 
-		writer.write("}");
+		writer.write("\n}");
 	}
 
 	/**

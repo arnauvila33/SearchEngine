@@ -50,11 +50,7 @@ public class TextParser {
 	 * @see #parse(String)
 	 */
 	public static String[] parse(String text) {
-		text = clean(text);
-		String[] res = split(text);
-		return res;
-		
-		// TODO return split(clean(text));
+		return split(clean(text));
 	}
 
 }
