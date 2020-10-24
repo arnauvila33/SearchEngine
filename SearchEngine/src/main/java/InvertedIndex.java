@@ -4,7 +4,7 @@ import java.nio.file.Paths;
 import java.util.*;
 
 /**
- * A special type of {@link SimpleIndex} that indexes the UNIQUE words that were
+ * A special type of simpleIndex that indexes the UNIQUE words that were
  * found in a text file.
  *
  * @author CS 212 Software Development
