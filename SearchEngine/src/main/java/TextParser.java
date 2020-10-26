@@ -1,5 +1,4 @@
 import java.text.Normalizer;
-import java.util.Arrays;
 import java.util.regex.Pattern;
 
 /**
@@ -18,8 +17,8 @@ public class TextParser {
 
 	/**
 	 * Cleans the text by removing any non-alphabetic characters (e.g. non-letters
-	 * like digits, punctuation, symbols, and diacritical marks like the umlaut)
-	 * and converting the remaining characters to lowercase.
+	 * like digits, punctuation, symbols, and diacritical marks like the umlaut) and
+	 * converting the remaining characters to lowercase.
 	 *
 	 * @param text the text to clean
 	 * @return cleaned text
@@ -51,28 +50,7 @@ public class TextParser {
 	 * @see #parse(String)
 	 */
 	public static String[] parse(String text) {
-		/*
-		 * 
-		 * - calling clean(...) then split(...)
-		 * - calling split(...) then clean(...)
-		 * Choose the option that does not generate empty strings.
-		 */
-	
-		text=clean(text);
-		String[] res=split(text);
-		return res;
+		return split(clean(text));
 	}
 
-	/**
-	 * A simple main method that demonstrates this class.
-	 *
-	 * @param args unused
-	 */
-	public static void main(String[] args) {
-		String text = "Sally Sue...\t sells 76 sea-shells    at THE sEa_shorE soirée!";
-
-		System.out.println("clean: " + clean(text));
-		System.out.println("split: " + Arrays.toString(split(text)));
-		System.out.println("parse: " + Arrays.toString(parse(text)));
-	}
 }

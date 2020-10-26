@@ -1,397 +1,178 @@
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 
+/**
+ * A special type of simpleIndex that indexes the UNIQUE words that were found
+ * in a text file.
+ *
+ * @author CS 212 Software Development
+ * @author University of San Francisco
+ * @version Fall 2020
+ */
 public class InvertedIndex {
+
+	/** map where values are stored */
+	private final TreeMap<String, TreeMap<String, TreeSet<Integer>>> invertedIndex;
 	
-	private static TreeMap<String,Integer> countmap=new TreeMap<String,Integer>();
-	private static ArgumentMap argumentMap;
-	
+	private static TreeMap<String,Integer> countMap;
+
+	/**
+	 * Constructor for Inverted Index
+	 */
 	public InvertedIndex() {
-		countmap=new TreeMap<String,Integer>();
-	}
-	/**
-	 * Used to deal with the unique cases
-	 * @param argumentMap ArgumentMap passed
-	 * @return boolean to see if it should stop the execution
-	 * @throws IOException exception
-	 */
-	private static boolean checkExceptions(ArgumentMap argumentMap) throws IOException {
-		
-		//Unique Case to deal with an empty output
-		if(argumentMap.hasFlag("-path")==false&&argumentMap.hasFlag("-results")==true) {
-			TextFileIndex textFileIndex=new TextFileIndex();
-			SimpleJsonWriter.asinvertedIndex(textFileIndex.map,Paths.get("results.json"));
-			System.out.println("No input path given. Printed an empty file.");		
-			return false;
-		}
-
-		//Unique Case to deal with an empty output
-		if(argumentMap.hasFlag("-path")==false&&argumentMap.hasFlag("-index")==true) {
-			TextFileIndex textFileIndex=new TextFileIndex();
-			SimpleJsonWriter.asinvertedIndex(textFileIndex.map,Paths.get("index.json"));
-			System.out.println("No input path given. Printed an empty file.");		
-			return false;
-		}
-
-		//If there is no input path
-		if(argumentMap.hasFlag("-path")==false||argumentMap.getPath("-path")==null) {
-			System.out.println("No input path given.");	
-			return false;
-
-		}
-		
-		//If the path is not readable or non-existent
-		if(!Files.isReadable(argumentMap.getPath("-path"))&&!Files.exists(argumentMap.getPath("-path"))) {
-			System.out.println("Path given is not readable or does not exist.");	
-			return false;
-		}
-		
-		if(argumentMap.hasFlag("-queries")&&argumentMap.getPath("-queries")==null) {
-			System.out.println("Querie flag doesn't have a path associated with it.");
-			return false;
-		}
-		if(argumentMap.hasFlag("-queries")&&!Files.exists(argumentMap.getPath("-queries"))) {
-			System.out.println("Querie flag has an invalid path");
-			return false;
-		}
-		
-		return true;
-
-	}
-
-	// TODO Use Java naming conventions (avoid abbreviations, camel case, etc.)
-	// TODO Also format code
-
-	/**
-	 * Main method for invertedIndex. Processes the path and index given, and calls the functions needed.
-	 * @param args The arguments passed
-	 * @throws Exception exception
-	 */
-	public void makeInvertedIndex(String[] args) throws Exception {
-		
-		boolean isOutput=true; //Checks if there's going to be an output file.
-
-		Path outputFile=null;
-
-		//ArgumentMap used to handle args with flags
-		argumentMap=new ArgumentMap(args);
-
-		//Checks and deals the Unique cases
-		if(!checkExceptions(argumentMap)) {
-			System.out.println("Please try again with a valid path and index.");
-			return;
-		}
-		
-		boolean queries=true;
-		if(!argumentMap.hasFlag("-queries")) {
-			queries=false;
-		}
-	
-		TextFileIndex textFileIndex;
-			if(!argumentMap.hasFlag("-index")){
-				isOutput=false;
-			}else if(argumentMap.getPath("-index")==null)
-				outputFile=argumentMap.getPath("-index",Paths.get("index.json"));
-			else {
-				outputFile=argumentMap.getPath("-index");
-			}
-			if(argumentMap.getString("-path").toLowerCase().endsWith(".txt")||argumentMap.getString("-path").toLowerCase().endsWith(".text")||argumentMap.getString("-path").toLowerCase().endsWith(".md")){
-				textFileIndex=computeSingleFile(argumentMap.getPath("-path"),outputFile,isOutput);
-			}
-			else {
-				textFileIndex=computeDirectory(argumentMap.getPath("-path"),outputFile,isOutput);
-			}
-			
-			
-			if(queries) {
-				processQuerie(argumentMap.getPath("-queries"),textFileIndex);
-			}
-	
-			
-		
-		
-
-	}
-
-	 
-	/**
-	 * process Querie processes the querie passed and processes results
-	 * @param querie the querie path
-	 * @param textFileIndex the inverted index structure used
-	 * @throws IOException exception
-	 */
-	
-	private static void processQuerie(Path querie,TextFileIndex textFileIndex) throws IOException {
-		Map<String, ArrayList<SingleQuerie>> querieSearchList=new TreeMap<String, ArrayList<SingleQuerie>>();
-		
-		BufferedReader reader = Files.newBufferedReader(querie, StandardCharsets.UTF_8);
-		
-			
-		String line=null;
-		while ((line = reader.readLine()) != null) {	
-			ArrayList<String> list=new ArrayList<String>();
-			list=TextFileStemmer.listStems(line);
-			Collections.sort(list);
-			for(int i=list.size()-1;i>0;i--) {
-				if(list.get(i).equals(list.get(i-1)))
-					list.remove(i);
-			}
-			String QuerieString=String.join(" ",list);
-			ArrayList<SingleQuerie> queries=new ArrayList<SingleQuerie>();
-			
-			if(argumentMap.hasFlag("-exact")&&list.size()!=0) {
-				queries=exactSearch(list,textFileIndex);
-				querieSearchList.put(QuerieString, queries);
-			}
-			else if(list.size()!=0) {
-				queries=partialSearch(list,textFileIndex);				
-				querieSearchList.put(QuerieString, queries);
-			}
-			
-				
-		}
-		if(argumentMap.hasFlag("-results")) {
-			if(argumentMap.getPath("-results")==null) {
-				Files.deleteIfExists(Paths.get("results.json"));
-				SimpleJsonWriter.asNestedObject(querieSearchList,Paths.get("results.json"));
-			}
-			else
-				SimpleJsonWriter.asNestedObject(querieSearchList,argumentMap.getPath("-results"));
-		}
-		
-		
-	}
-	
-	/**
-	 * orderQuerieList by bubble sort
-	 * @param list list of SingleQuerie objects to sort based on SingleQuerie.compareTo
-	 * @return returns the ordered list
-	 */
-	private static ArrayList<SingleQuerie> orderQuerieList(ArrayList<SingleQuerie> list){
-		
-		SingleQuerie temp;
-		for(int j=0;j<list.size();j++) {
-			
-			for(int i=0;i<list.size()-1;i++) {
-				if(list.get(i).compareTo(list.get(j))<0) {
-					temp = list.get(i);
-	                list.set(i, list.get(j));
-	                list.set(j, temp);
-	        
-				}
-			}
-		}
-		
-		return list;
-	}
-	
-	/**
-	 * This function does a partial search on the querie of words given. It uses the inverted index structure 
-	 * for better performance.
-	 * @param querie the querie passed to search
-	 * @param textFileIndex the inverted index structure used
-	 * @return the list with all the querie results ordered.
-	 */
-	private static ArrayList<SingleQuerie> partialSearch(ArrayList<String> querie,TextFileIndex textFileIndex) {
-		ArrayList<SingleQuerie> querieResults=new ArrayList<SingleQuerie>(); 
-		ArrayList<Path> foundpaths=new ArrayList<Path>();
-		if(querie.size()<1) {
-			return querieResults;
-		}
-		int countt=0;
-		
-		while(countt<querie.size()) {
-			Collection<Collection<Path>> pathss=textFileIndex.getPartial(querie.get(countt++));
-			
-			for(Collection<Path> listOfWords:pathss) {
-				
-				
-				for(Path path:listOfWords) {
-					
-					if(!foundpaths.contains(path)) {
-						int count=0;
-						foundpaths.add(path);
-						String where=path.toString();
-
-						for(String words:querie) {		
-							Collection<String> fullWords=textFileIndex.getPartialWords(words);
-							for(String fullWord:fullWords) {
-								count+=textFileIndex.get(fullWord,path).size();	
-							}
-					
-						}
-						double score=(double)count/(double)countmap.get(path.toString());
-						SingleQuerie querieTemp=new SingleQuerie(where,count,score);
-						querieResults.add(querieTemp);
-	
-					}
-					
-				}
-				
-			}
-		}
-		querieResults=orderQuerieList(querieResults);
-		return querieResults;
-		
-	}
-	/**
-	 * ExactSearch method that looks into the inverted index to search for the querie.
-	 * @param querie the querie passed to search
-	 * @param textFileIndex the inverted index structure used
-	 * @return the list with all the querie results ordered
-	 */
-	private static ArrayList<SingleQuerie> exactSearch(ArrayList<String> querie,TextFileIndex textFileIndex) {
-		ArrayList<SingleQuerie> querieResults=new ArrayList<SingleQuerie>(); 
-		ArrayList<Path> foundpaths=new ArrayList<Path>();
-		if(querie.size()<1) {
-			return querieResults;
-		}
-		int countt=0;
-		while(countt<querie.size()) {
-			Collection<Path> pathss=textFileIndex.get(querie.get(countt++));
-		
-		for(Path path:pathss) {
-			if(!foundpaths.contains(path)) {
-				foundpaths.add(path);
-			String where=path.toString();
-			int count=0;
-			
-			
-			int validPath=0;
-			for(String words:querie) {			
-				if(textFileIndex.get(words).contains(path)) {
-					count+=textFileIndex.get(words,path).size();
-				}
-				validPath++;
-			}
-			
-			if(validPath==querie.size()) {
-				double score=(double)count/(double)countmap.get(path.toString());
-				SingleQuerie querieTemp=new SingleQuerie(where,count,score);
-				querieResults.add(querieTemp);
-			}
-			}
-		}
-		}
-		querieResults=orderQuerieList(querieResults);
-		return querieResults;
-		
-	}
-	/**
-	 * Used to compute a singleTxt file. 
-	 * @param inputPath the path of the text file to compute.
-	 * @param outputPath the path where the output file will be written.
-	 * @param printOutput Boolean that checks if there should be an output file or not.
-	 * @throws IOException exception 
-	 */
-	private static TextFileIndex computeSingleFile(Path inputPath,Path outputPath,boolean printOutput) throws IOException {
-		ArrayList<String> input=TextFileStemmer.listStems(inputPath);
-		TextFileIndex textFileIndex=new TextFileIndex();
-		int i=1;
-		if(input.size()>0)
-			countmap.put(inputPath.toString(), 0);
-		for(String x:input) {
-			countmap.replace(inputPath.toString(), countmap.get(inputPath.toString())+1);
-			textFileIndex.add(inputPath.toString(), x, i++);
-		}
-
-		printOutputFile(outputPath,printOutput,textFileIndex);
-		return textFileIndex;
+		invertedIndex = new TreeMap<String, TreeMap<String, TreeSet<Integer>>>();
+		countMap=new TreeMap<String,Integer>();
 	}
 
 	/**
-	 * Compute Directory computes the inputPath given. It calls functions as needed.
+	 * Adds the location and word to map.
 	 * 
-	 * @param inputPath the path of thew text file to compute.
-	 * @param outputPath  the path where the output file will be written.
-	 * @param printOutput Boolean that checks if there should be an output file or not.
+	 * @param word     the word foundd
+	 * @param location the location the word was found
+	 * @param position position
+	 */
+	public void add(String word, String location, int position) {
+		invertedIndex.putIfAbsent(word, new TreeMap<>());
+		invertedIndex.get(word).putIfAbsent(location, new TreeSet<>());
+		invertedIndex.get(word).get(location).add(position);
+		countMap.putIfAbsent(location, 0);
+		countMap.replace(location, countMap.get(location)+1);
+	}
+	/**
+	 * Determines whether the location is stored in the index.
+	 *
+	 * @param word the location to lookup
+	 * @return {@true} if the location is stored in the index
+	 */
+	public boolean contains(String word) {
+		return !invertedIndex.isEmpty() && invertedIndex.containsKey(word);
+
+	}
+
+	/**
+	 * Determines whether the word is stored in the index and the path is stored for
+	 * that word.
+	 *
+	 * @param word the location to lookup
+	 * @param path the word in that location to lookup
+	 * 
+	 * @return {@true} if the location and word is stored in the index
+	 */
+	public boolean contains(String word, String path) {
+		return contains(word) && invertedIndex.get(word).containsKey(path.toString());
+	}
+
+	/**
+	 * Determines whether the word is stored in the index, and the path is stored in
+	 * that word, and that the position is in that path.
+	 * 
+	 * @param word     to look
+	 * @param path     to look
+	 * @param position to look
+	 * @return {@true} if the location, word, and position is stored in the index
+	 */
+	public boolean contains(String word, String path, int position) {
+		return contains(word, path) && invertedIndex.get(word).get(path.toString()).contains(position);
+	}
+
+	/**
+	 * Returns an unmodifiable view of the words stored in the index.
+	 *
+	 * @return an unmodifiable view of the locations stored in the index
+	 * @see Collections#unmodifiableCollection(Collection)
+	 */
+	public Collection<String> get() {
+		return Collections.unmodifiableCollection(invertedIndex.keySet());
+	}
+	
+	public Integer getCount(String word) {
+		return countMap.get(word);
+	}
+	/**
+	 * Returns a collection of paths for the word given.
+	 *
+	 * @param word the location to lookup
+	 * @return an unmodifiable view of the words stored for the location
+	 */
+	public Collection<String> get(String word) {
+		if (contains(word))
+			return Collections.unmodifiableCollection(invertedIndex.get(word).keySet());
+		else
+			return Collections.emptySet();
+	}
+
+	/**
+	 * Returns the positions of the word in the path give.
+	 * 
+	 * @param word word to look for
+	 * @param path path to look for
+	 * @return the list of positions
+	 */
+	public Collection<Integer> get(String word, String path) {
+		if (contains(word, path)) {
+			return Collections.unmodifiableCollection(invertedIndex.get(word).get(path));
+		} else
+			return Collections.emptySet();
+	}
+
+	/**
+	 * Returns the number of words stored in the index.
+	 *
+	 * @return 0 if the index is empty, otherwise the number of locations in the
+	 *         index
+	 */
+	public int size() {
+		return invertedIndex.size();
+	}
+
+	/**
+	 * Returns the number of paths stored for the given word.
+	 *
+	 * @param word the location to lookup
+	 * @return 0 if the location is not in the index or has no words, otherwise the
+	 *         number of words stored for that element
+	 */
+	public int size(String word) {
+		return get(word).size();
+	}
+
+	/**
+	 * Returns the number of positions in the path given for the word given.
+	 * 
+	 * @param word word to use to search
+	 * @param path to use to search
+	 * @return 0 if word or path are not present, or the actual size
+	 */
+	public int size(String word, String path) {
+		return get(word, path).size();
+	}
+
+	/**
+	 * Prints the invertedIndex to the path given
+	 * 
+	 * @param path the path to print the invertedIndex to
 	 * @throws IOException exception
 	 */
-	private static TextFileIndex computeDirectory(Path inputPath, Path outputPath, boolean printOutput)throws IOException{
-		TextFileIndex textFileIndex=new TextFileIndex();
-		ArrayList<Path> pathList=new ArrayList<Path>();
-		pathList=traverseDirectory(inputPath,pathList);
-
-		for(Path path:pathList) {
-			ArrayList<String> input=TextFileStemmer.listStems(path);
-			if(!countmap.containsKey(path.toString())&&input.size()>0) {
-				countmap.put(path.toString(), 0);
-			}
-			int i=1;
-			for(String x:input) {
-				countmap.replace(path.toString(), countmap.get(path.toString())+1);
-				textFileIndex.add(path.toString(), x, i++);
-			}
-
-		}
-		printOutputFile(outputPath,printOutput,textFileIndex);
-		return textFileIndex;
+	public void toJson(Path path) throws IOException {
+		SimpleJsonWriter.asinvertedIndex(invertedIndex, path);
+	}
+	
+	public void countToJason(Path path) throws IOException {
+		SimpleJsonWriter.asObject(countMap, path);
 	}
 	
 	/**
-	 * It prints the textFileIndex as an InvertedIndex in the outputPath if printOutput is true.
+	 * toString modification
 	 * 
-	 * @param outputPath path to write to.
-	 * @param printOutput boolean that decides if we should write to output file or not.
-	 * @param textFileInd the textFileIndex used to write to path.
-	 * @throws IOException exception
 	 */
-	private static void printOutputFile(Path outputPath, boolean printOutput, TextFileIndex textFileInd) throws IOException {
-		printCount();
-		if(printOutput) {
-			SimpleJsonWriter.asinvertedIndex(textFileInd.map,outputPath.normalize());
-		} 
-		else if(argumentMap.getPath("-path").toString().equals("input/text/simple")&&argumentMap.hasFlag("-exact")){
-			Files.delete(Paths.get("inverted.txt").normalize());
-			SimpleJsonWriter.asinvertedIndex(textFileInd.map,Paths.get("inverted.txt").normalize());
-		}
+	public String toString() {
+		return invertedIndex.toString();
 	}
 	
-	/**
-	 * This function outputs the count to the counts path
-	 * @throws IOException exception
-	 */
-	private static void printCount() throws IOException {
-		if(argumentMap.hasFlag("-counts"))
-			SimpleJsonWriter.asObject(countmap,argumentMap.getPath("-counts").normalize());
-	}
-	/**
-	 * Recursive function used to traverse all directories and find all .txt files.
-	 * 
-	 * @param directory The path directory to look for text files.
-	 * @param list The list where all the text files are stored.
-	 * @return the list with all the text files found.
-	 * @throws IOException exception
-	 */
-	private static ArrayList<Path> traverseDirectory(Path directory, ArrayList<Path> list) throws IOException {
-		try (DirectoryStream<Path> listing = Files.newDirectoryStream(directory)) {
-			// use an enhanced-for or for-each loop for efficiency and simplicity
-			for (Path path : listing) {
-				if (Files.isDirectory(path)) {
-					traverseDirectory(path, list);
-				}else if(path.toString().toLowerCase().endsWith(".txt")||path.toString().toLowerCase().endsWith(".text")&&Files.isReadable(path)) {
-					list.add(path);
-				}
-			}
-			return list;
-		}
-	}
+
+
+
 
 }
-

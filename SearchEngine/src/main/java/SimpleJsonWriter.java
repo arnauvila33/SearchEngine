@@ -32,24 +32,23 @@ public class SimpleJsonWriter {
 	 * Writes the elements as a pretty JSON array.
 	 *
 	 * @param elements the elements to write
-	 * @param writer the writer to use
-	 * @param level the initial indent level
+	 * @param writer   the writer to use
+	 * @param level    the initial indent level
 	 * @throws IOException if an IO error occurs
 	 */
 	public static void asArray(Collection<Integer> elements, Writer writer, int level) throws IOException {
-		
-		
 		writer.write("[");
-		writer.write("\n");
-		Iterator<Integer> it=elements.iterator();
-		for(Integer x:elements) {
-			indent(it.next(),writer,level+1);
-			if(it.hasNext())
-				writer.write(",");
+		Iterator<Integer> it = elements.iterator();
+		if (it.hasNext()) {
 			writer.write("\n");
-			
+			indent(it.next(), writer, level + 1);
 		}
-		indent(writer,level);
+		while (it.hasNext()) {
+			writer.write(",\n");
+			indent(it.next(), writer, level + 1);
+		}
+		writer.write("\n");
+		indent(writer, level);
 		writer.write("]");
 	}
 
@@ -57,97 +56,88 @@ public class SimpleJsonWriter {
 	 * Writes the elements as a pretty JSON object.
 	 *
 	 * @param elements the elements to write
-	 * @param writer the writer to use
-	 * @param level the initial indent level
+	 * @param writer   the writer to use
+	 * @param level    the initial indent level
 	 * @throws IOException if an IO error occurs
 	 */
-	public static <T> void asObject(Map<String, T> elements, Writer writer, int level) throws IOException {
-		
-		indent(writer,level);
+	public static void asObject(Map<String, Integer> elements, Writer writer, int level) throws IOException {
+
+		indent(writer, level);
 		writer.write("{");
-		int c=0;
-		for(Map.Entry<String, T> entry : elements.entrySet()) {
-			c++;
-			writeEntry(entry, writer, 1);
-			if(c!=elements.size())
-				writer.write(",");
-			
+		Iterator<Entry<String, Integer>> iterator = elements.entrySet().iterator();
+		if (iterator.hasNext()) {
+			writeEntry(iterator.next(), writer, level);
 		}
-		writer.write("\n");
-		writer.write("}");
-		
+		while (iterator.hasNext()) {
+			writer.write(",");
+			writeEntry(iterator.next(), writer, level);
+		}
+		writer.write("\n}");
+
 	}
 	
 	/**
 	 * Writes invertedIndex in pretty json format.
-	 * @param m map passed
-	 * @param writer used to write in file.
-	 * @param level to indent
+	 * 
+	 * @param invertedIndex map passed
+	 * @param writer        used to write in file.
+	 * @param level         to indent
 	 * @throws IOException exception
 	 */
-	public static void invertedIndex(Map<String, TreeMap<String, ArrayList<Integer>>> m, Writer writer, int level)throws IOException {
-		indent(writer,level);
+	public static void asInvertedIndex(Map<String, ? extends Map<String, ? extends Collection<Integer>>> invertedIndex,
+			Writer writer, int level) throws IOException {
+		indent(writer, level);
 		writer.write("{");
-		int c=0;
-		int c1=0;
-		writer.write("\n");
-		for(Entry<String, TreeMap<String, ArrayList<Integer>>> entry: m.entrySet()) {
-			c++;
-			indent(entry.getKey(),writer,level+1);
-			writer.write(": {");
+		var iterator = invertedIndex.entrySet().iterator();
+		Entry<String, ? extends Map<String, ? extends Collection<Integer>>> entry;
+		if (iterator.hasNext()) {
 			writer.write("\n");
-			for(Entry<String, ArrayList<Integer>> ent: entry.getValue().entrySet()) {
-				c1++;
-				indent(ent.getKey(),writer,level+2);
-				writer.write(": ");
-				asArray(ent.getValue(),writer,level+2);
-				if(c1!=entry.getValue().size())
-					writer.write(",");
-				writer.write("\n");				
-			}
-			indent(writer,level+1);
-			writer.write("}");
-			if(c!=m.size())
-				writer.write(",");
-			writer.write("\n");
-			
-			
-			c1=0;
-			
-			
+			entry = iterator.next();
+			indent(entry.getKey(), writer, level + 1);
+			writer.write(": ");
+			asNestedArray(entry.getValue(), writer, level + 1);
 		}
-		
-		writer.write("}");
+		while (iterator.hasNext()) {
+			writer.write(",\n");
+			entry = iterator.next();
+			indent(entry.getKey(), writer, level + 1);
+			writer.write(": ");
+			asNestedArray(entry.getValue(), writer, level + 1);
+		}
+
+		writer.write("\n}");
 	}
 	/**
-	 * Writes the elements as a pretty JSON object with a nested array. The
-	 * generic notation used allows this method to be used for any type of map
-	 * with any type of nested collection of integer objects.
+	 * Writes the elements as a pretty JSON object with a nested array. The generic
+	 * notation used allows this method to be used for any type of map with any type
+	 * of nested collection of integer objects.
 	 *
 	 * @param elements the elements to write
-	 * @param writer the writer to use
-	 * @param level the initial indent level
+	 * @param writer   the writer to use
+	 * @param level    the initial indent level
 	 * @throws IOException if an IO error occurs
 	 */
 	public static void asNestedArray(Map<String, ? extends Collection<Integer>> elements, Writer writer, int level)
 			throws IOException {
-		indent(writer,level);
 		writer.write("{");
-		int c=0;
-		writer.write("\n");
-		for(Entry<String, ? extends Collection<Integer>> entry: elements.entrySet()) {
-			c++;
-			indent(entry.getKey(),writer,level+1);
-			writer.write(": ");
-			asArray(entry.getValue(), writer, level+1);
-			if(c!=elements.size())
-				writer.write(",");
+		indent(writer, level);
+		var iterator = elements.entrySet().iterator();
+		Entry<String, ? extends Collection<Integer>> entry;
+		if (iterator.hasNext()) {
 			writer.write("\n");
-			
-			
+			entry = iterator.next();
+			indent(entry.getKey(), writer, level + 1);
+			writer.write(": ");
+			asArray(entry.getValue(), writer, level + 1);
 		}
-		
-		writer.write("}");		
+		while (iterator.hasNext()) {
+			writer.write(",\n");
+			entry = iterator.next();
+			indent(entry.getKey(), writer, level + 1);
+			writer.write(": ");
+			asArray(entry.getValue(), writer, level + 1);
+		}
+		writer.write("\n}");
 	}
 	
 	
@@ -209,7 +199,7 @@ public class SimpleJsonWriter {
 	 * @param level the indent level
 	 * @throws IOException exception
 	 */
-	public static void asNestedObject(Map<String, ? extends Collection<SingleQuerie>> elements, Writer writer, int level)
+	public static void asQuerieStructure(Map<String, ? extends Collection<SingleQuerie>> elements, Writer writer, int level)
 			throws IOException {
 		indent(writer,level);
 		writer.write("{");
@@ -408,46 +398,48 @@ public class SimpleJsonWriter {
 			return null;
 		}
 	}
-	
 	/**
 	 * Returns inverted index in a pretty json format to string
-	 * @param elements map
+	 * 
+	 * @param map Inverted Index passed
 	 * @return string
 	 */
-	public static String asinvertedIndex(Map<String, TreeMap<String, ArrayList<Integer>>> elements) {
-		// THIS CODE IS PROVIDED FOR YOU; DO NOT MODIFY
+	public static String asinvertedIndex(Map<String, ? extends Map<String, ? extends Collection<Integer>>> map) {
 		try {
 			StringWriter writer = new StringWriter();
-			invertedIndex(elements, writer, 0);
+			asInvertedIndex(map, writer, 0);
 			return writer.toString();
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			return null;
 		}
 	}
+
 	/**
 	 * Writes the inverted index in a pretty json format to a file
-	 * @param elements map
+	 * 
+	 * @param map  Inverted Index passed
 	 * @param path used
 	 * @throws IOException exception
 	 */
-	public static void asinvertedIndex(Map<String, TreeMap<String, ArrayList<Integer>>> elements, Path path) throws IOException {
-		// THIS CODE IS PROVIDED FOR YOU; DO NOT MODIFY
+	public static void asinvertedIndex(Map<String, ? extends Map<String, ? extends Collection<Integer>>> map, Path path)
+			throws IOException {
 		try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
-			invertedIndex(elements, writer, 0);
+			asInvertedIndex(map, writer, 0);
 		}
 	}
+
+
 	
 	/**
 	 * Returns inverted index in a pretty json format to string
 	 * @param elements map
 	 * @return string 
 	 */
-	public static String asNestedObject(Map<String, ? extends Collection<SingleQuerie>> elements) {
+	public static String asQuerieStructure(Map<String, ? extends Collection<SingleQuerie>> elements) {
 		// THIS CODE IS PROVIDED FOR YOU; DO NOT MODIFY
 		try {
 			StringWriter writer = new StringWriter();
-			asNestedObject(elements, writer, 0);
+			asQuerieStructure(elements, writer, 0);
 			return writer.toString();
 		}
 		catch (IOException e) {
@@ -460,32 +452,11 @@ public class SimpleJsonWriter {
 	 * @param path used
 	 * @throws IOException exception
 	 */
-	public static void asNestedObject(Map<String, ? extends Collection<SingleQuerie>> elements, Path path) throws IOException {
+	public static void asQuerieStructure(Map<String, ? extends Collection<SingleQuerie>> elements, Path path) throws IOException {
 		// THIS CODE IS PROVIDED FOR YOU; DO NOT MODIFY
 		try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
-			asNestedObject(elements, writer, 0);
+			asQuerieStructure(elements, writer, 0);
 		}
 	}
 
-	/**
-	 * A simple main method that demonstrates this class.
-	 *
-	 * @param args unused
-	 */
-	public static void main(String[] args) {
-		// MODIFY AS NECESSARY TO DEBUG YOUR CODE
-
-		TreeSet<Integer> elements = new TreeSet<>();
-		System.out.println("Empty:");
-		System.out.println(asArray(elements));
-
-		elements.add(65);
-		System.out.println("\nSingle:");
-		System.out.println(asArray(elements));
-
-		elements.add(66);
-		elements.add(67);
-		System.out.println("\nSimple:");
-		System.out.println(asArray(elements));
-	}
 }

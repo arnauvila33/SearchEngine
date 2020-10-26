@@ -21,7 +21,7 @@ public class SingleQuerie{
 		this.score=score;
 		querie.put("where: ", where);
 		querie.put("count: ",  count);
-		querie.put("cvore: ", score);
+		querie.put("score: ", score);
 	}
 	
 	/**
@@ -35,7 +35,7 @@ public class SingleQuerie{
 		if(Integer.compare(count, list.count)!=0)
 			return Integer.compare(count, list.count);
 		if(where.toLowerCase().compareToIgnoreCase(list.where.toLowerCase())!=0)
-			return -1*where.toLowerCase().compareToIgnoreCase(list.where.toLowerCase());
+			return list.where.toLowerCase().compareToIgnoreCase(where.toLowerCase());
 		return 0;
 	}
 	
