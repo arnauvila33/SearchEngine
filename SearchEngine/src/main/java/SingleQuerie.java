@@ -1,6 +1,6 @@
 import java.util.*;
 
-public class SingleQuerie{
+public class SingleQuerie implements Comparable<SingleQuerie>{
 	public String where;
 	public int count;
 	public double score;
@@ -31,11 +31,11 @@ public class SingleQuerie{
 	 */
 	public int compareTo(SingleQuerie list) {
 		if(Double.compare(score, list.score)!=0)
-			return Double.compare(score, list.score);
+			return Double.compare(list.score, score);
 		if(Integer.compare(count, list.count)!=0)
-			return Integer.compare(count, list.count);
+			return Integer.compare(list.count, count);
 		if(where.toLowerCase().compareToIgnoreCase(list.where.toLowerCase())!=0)
-			return list.where.toLowerCase().compareToIgnoreCase(where.toLowerCase());
+			return where.toLowerCase().compareToIgnoreCase(list.where.toLowerCase());
 		return 0;
 	}
 	

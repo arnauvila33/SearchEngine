@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.TreeSet;
 
@@ -56,33 +57,8 @@ public class QuerieBuilder {
 			SingleQuerie querieTemp = new SingleQuerie(where, count, score);
 			querieResults.add(querieTemp);
 		}
-		querieResults = orderQuerieList(querieResults);
+		Collections.sort(querieResults);
 		return querieResults;
-	}
-
-	/**
-	 * orderQuerieList by bubble sort
-	 * 
-	 * @param list list of SingleQuerie objects to sort based on
-	 *             SingleQuerie.compareTo
-	 * @return returns the ordered list
-	 */
-	private static ArrayList<SingleQuerie> orderQuerieList(ArrayList<SingleQuerie> list) {
-
-		SingleQuerie temp;
-		for (int j = 0; j < list.size(); j++) {
-
-			for (int i = 0; i < list.size() - 1; i++) {
-				if (list.get(i).compareTo(list.get(j)) < 0) {
-					temp = list.get(i);
-					list.set(i, list.get(j));
-					list.set(j, temp);
-
-				}
-			}
-		}
-
-		return list;
 	}
 
 	public static TreeSet<String> getPartialWords(TreeSet<String> querie, InvertedIndex invertedIndex) {
