@@ -1,6 +1,6 @@
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+
 import java.util.*;
 
 /**
@@ -15,15 +15,15 @@ public class InvertedIndex {
 
 	/** map where values are stored */
 	private final TreeMap<String, TreeMap<String, TreeSet<Integer>>> invertedIndex;
-	
-	private static TreeMap<String,Integer> countMap;
+
+	private static TreeMap<String, Integer> countMap;
 
 	/**
 	 * Constructor for Inverted Index
 	 */
 	public InvertedIndex() {
 		invertedIndex = new TreeMap<String, TreeMap<String, TreeSet<Integer>>>();
-		countMap=new TreeMap<String,Integer>();
+		countMap = new TreeMap<String, Integer>();
 	}
 
 	/**
@@ -38,8 +38,9 @@ public class InvertedIndex {
 		invertedIndex.get(word).putIfAbsent(location, new TreeSet<>());
 		invertedIndex.get(word).get(location).add(position);
 		countMap.putIfAbsent(location, 0);
-		countMap.replace(location, countMap.get(location)+1);
+		countMap.replace(location, countMap.get(location) + 1);
 	}
+
 	/**
 	 * Determines whether the location is stored in the index.
 	 *
@@ -86,10 +87,11 @@ public class InvertedIndex {
 	public Collection<String> get() {
 		return Collections.unmodifiableCollection(invertedIndex.keySet());
 	}
-	
+
 	public Integer getCount(String word) {
 		return countMap.get(word);
 	}
+
 	/**
 	 * Returns a collection of paths for the word given.
 	 *
@@ -158,11 +160,11 @@ public class InvertedIndex {
 	public void toJson(Path path) throws IOException {
 		SimpleJsonWriter.asinvertedIndex(invertedIndex, path);
 	}
-	
+
 	public void countToJason(Path path) throws IOException {
 		SimpleJsonWriter.asObject(countMap, path);
 	}
-	
+
 	/**
 	 * toString modification
 	 * 
@@ -170,9 +172,5 @@ public class InvertedIndex {
 	public String toString() {
 		return invertedIndex.toString();
 	}
-	
-
-
-
 
 }

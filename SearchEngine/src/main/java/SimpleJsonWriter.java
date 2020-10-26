@@ -5,13 +5,11 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
-import java.util.TreeSet;
 
 /**
  * Outputs several simple data structures in "pretty" JSON format where newlines
@@ -25,9 +23,7 @@ import java.util.TreeSet;
  * @version Fall 2020
  */
 public class SimpleJsonWriter {
-	
-	
-	
+
 	/**
 	 * Writes the elements as a pretty JSON array.
 	 *
@@ -75,7 +71,7 @@ public class SimpleJsonWriter {
 		writer.write("\n}");
 
 	}
-	
+
 	/**
 	 * Writes invertedIndex in pretty json format.
 	 * 
@@ -107,6 +103,7 @@ public class SimpleJsonWriter {
 
 		writer.write("\n}");
 	}
+
 	/**
 	 * Writes the elements as a pretty JSON object with a nested array. The generic
 	 * notation used allows this method to be used for any type of map with any type
@@ -139,94 +136,97 @@ public class SimpleJsonWriter {
 		}
 		writer.write("\n}");
 	}
-	
-	
+
+
 	/**
-	 * Writes the querie as a pretty json file
-	 * @param querie the querie object to write
-	 * @param writer the writer used
-	 * @param level the indent level passed
+	 * Writes the Querie search as a pretty JSON file
+	 * 
+	 * @param elements the data structure that holds the querie results
+	 * @param writer   the writer used
+	 * @param level    the indent level
 	 * @throws IOException exception
 	 */
-	public static void asQuerie(SingleQuerie querie, Writer writer, int level) throws IOException {
-		indent(writer,level+1);
-		writer.write("{\n");
-		indent("where",writer,level+2);
-		writer.write(": ");
-		writer.write('"'+querie.where+'"');
-		writer.write(",\n");
-		indent("count",writer,level+2);
-		writer.write(": ");
-		writer.write(String.valueOf(querie.count));
-		writer.write(",\n");
-		indent("score",writer,level+2);
-		writer.write(": ");
-		writer.write(String.format("%.8f", querie.score));
+	public static void asQuerieStructure(Map<String, ? extends Collection<SingleQuerie>> elements, Writer writer,
+			int level) throws IOException {
+		indent(writer, level);
+		writer.write("{");
 		writer.write("\n");
-		indent(writer,level+1);
-		writer.write("}");
+		var iterator = elements.entrySet().iterator();
+		Entry<String, ? extends Collection<SingleQuerie>> entry;
+		if (iterator.hasNext()) {
+			entry = iterator.next();
+			indent(entry.getKey(), writer, level + 1);
+			writer.write(": ");
+			asArrayQuerie(entry.getValue(), writer, level + 1);
+		}
+		while (iterator.hasNext()) {
+			entry = iterator.next();
+			writer.write(",");
+			writer.write("\n");
+			indent(entry.getKey(), writer, level + 1);
+			writer.write(": ");
+			asArrayQuerie(entry.getValue(), writer, level + 1);
+		}
+
+		writer.write("\n}");
 	}
 	/**
 	 * Writes the elements as a pretty JSON array.
 	 *
 	 * @param elements the elements to write
-	 * @param writer the writer to use
-	 * @param level the initial indent level
+	 * @param writer   the writer to use
+	 * @param level    the initial indent level
 	 * @throws IOException if an IO error occurs
 	 */
 	public static void asArrayQuerie(Collection<SingleQuerie> elements, Writer writer, int level) throws IOException {
-	
+
 		writer.write("[");
-		writer.write("\n");
-		Iterator<SingleQuerie> it=elements.iterator();
-		int c=0;
-		for(SingleQuerie x:elements) {
-			c++;
-			asQuerie(x,writer,level);
-			if(c!=elements.size())
-				writer.write(",");
-			writer.write("\n");
-			
+		Iterator<SingleQuerie> iterator = elements.iterator();
+		if (iterator.hasNext()) {
+			asQuerie(iterator.next(), writer, level);
 		}
-		indent(writer,level);
+		while (iterator.hasNext()) {
+			writer.write(",");
+			asQuerie(iterator.next(), writer, level);
+		}
+		writer.write("\n");
+		indent(writer, level);
 		writer.write("]");
 	}
-	
+
+
 	/**
-	 * Writes the Querie search as a pretty JSON file
-	 * @param elements the data structure that holds the querie results
+	 * Writes the querie as a pretty json file
+	 * 
+	 * @param querie the querie object to write
 	 * @param writer the writer used
-	 * @param level the indent level
+	 * @param level  the indent level passed
 	 * @throws IOException exception
 	 */
-	public static void asQuerieStructure(Map<String, ? extends Collection<SingleQuerie>> elements, Writer writer, int level)
-			throws IOException {
-		indent(writer,level);
-		writer.write("{");
-		int c=0;
+	public static void asQuerie(SingleQuerie querie, Writer writer, int level) throws IOException {
 		writer.write("\n");
-		for(Entry<String, ? extends Collection<SingleQuerie>> entry: elements.entrySet()) {
-			c++;
-			indent(entry.getKey(),writer,level+1);
-			writer.write(": ");
-			asArrayQuerie(entry.getValue(), writer, level+1);
-			if(c!=elements.size())
-				writer.write(",");
-			writer.write("\n");
-			
-			
-		}
-		
+		indent(writer, level + 1);
+		writer.write("{\n");
+		indent("where", writer, level + 2);
+		writer.write(": ");
+		writer.write('"' + querie.where + '"');
+		writer.write(",\n");
+		indent("count", writer, level + 2);
+		writer.write(": ");
+		writer.write(String.valueOf(querie.count));
+		writer.write(",\n");
+		indent("score", writer, level + 2);
+		writer.write(": ");
+		writer.write(String.format("%.8f", querie.score));
+		writer.write("\n");
+		indent(writer, level + 1);
 		writer.write("}");
 	}
-
-
-
 	/**
 	 * Indents using a tab character by the number of times specified.
 	 *
 	 * @param writer the writer to use
-	 * @param times the number of times to write a tab symbol
+	 * @param times  the number of times to write a tab symbol
 	 * @throws IOException if an IO error occurs
 	 */
 	public static void indent(Writer writer, int times) throws IOException {
@@ -239,8 +239,8 @@ public class SimpleJsonWriter {
 	 * Indents and then writes the integer element.
 	 *
 	 * @param element the element to write
-	 * @param writer the writer to use
-	 * @param times the number of times to indent
+	 * @param writer  the writer to use
+	 * @param times   the number of times to indent
 	 * @throws IOException if an IO error occurs
 	 *
 	 * @see #indent(Writer, int)
@@ -251,12 +251,12 @@ public class SimpleJsonWriter {
 	}
 
 	/**
-	 * Indents and then writes the text element surrounded by {@code " "}
-	 * quotation marks.
+	 * Indents and then writes the text element surrounded by {@code " "} quotation
+	 * marks.
 	 *
 	 * @param element the element to write
-	 * @param writer the writer to use
-	 * @param times the number of times to indent
+	 * @param writer  the writer to use
+	 * @param times   the number of times to indent
 	 * @throws IOException if an IO error occurs
 	 *
 	 * @see #indent(Writer, int)
@@ -271,9 +271,9 @@ public class SimpleJsonWriter {
 	/**
 	 * Writes a map entry in pretty JSON format.
 	 *
-	 * @param entry the nested entry to write
+	 * @param entry  the nested entry to write
 	 * @param writer the writer to use
-	 * @param level the initial indentation level
+	 * @param level  the initial indentation level
 	 * @throws IOException if an IO error occurs
 	 */
 	public static <T> void writeEntry(Entry<String, T> entry, Writer writer, int level) throws IOException {
@@ -282,11 +282,7 @@ public class SimpleJsonWriter {
 		writer.write(": ");
 		writer.write(entry.getValue().toString());
 	}
-	
 
-	
-	
-	
 	/*
 	 * These methods are provided for you. No changes are required.
 	 */
@@ -295,7 +291,7 @@ public class SimpleJsonWriter {
 	 * Writes the elements as a pretty JSON array to file.
 	 *
 	 * @param elements the elements to write
-	 * @param path the file path to use
+	 * @param path     the file path to use
 	 * @throws IOException if an IO error occurs
 	 *
 	 * @see #asArray(Collection, Writer, int)
@@ -321,8 +317,7 @@ public class SimpleJsonWriter {
 			StringWriter writer = new StringWriter();
 			asArray(elements, writer, 0);
 			return writer.toString();
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			return null;
 		}
 	}
@@ -331,7 +326,7 @@ public class SimpleJsonWriter {
 	 * Writes the elements as a pretty JSON object to file.
 	 *
 	 * @param elements the elements to write
-	 * @param path the file path to use
+	 * @param path     the file path to use
 	 * @throws IOException if an IO error occurs
 	 *
 	 * @see #asObject(Map, Writer, int)
@@ -357,8 +352,7 @@ public class SimpleJsonWriter {
 			StringWriter writer = new StringWriter();
 			asObject(elements, writer, 0);
 			return writer.toString();
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			return null;
 		}
 	}
@@ -367,12 +361,13 @@ public class SimpleJsonWriter {
 	 * Writes the elements as a nested pretty JSON object to file.
 	 *
 	 * @param elements the elements to write
-	 * @param path the file path to use
+	 * @param path     the file path to use
 	 * @throws IOException if an IO error occurs
 	 *
 	 * @see #asNestedArray(Map, Writer, int)
 	 */
-	public static void asNestedArray(Map<String, ? extends Collection<Integer>> elements, Path path) throws IOException {
+	public static void asNestedArray(Map<String, ? extends Collection<Integer>> elements, Path path)
+			throws IOException {
 		// THIS CODE IS PROVIDED FOR YOU; DO NOT MODIFY
 		try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
 			asNestedArray(elements, writer, 0);
@@ -393,11 +388,11 @@ public class SimpleJsonWriter {
 			StringWriter writer = new StringWriter();
 			asNestedArray(elements, writer, 0);
 			return writer.toString();
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			return null;
 		}
 	}
+
 	/**
 	 * Returns inverted index in a pretty json format to string
 	 * 
@@ -428,12 +423,11 @@ public class SimpleJsonWriter {
 		}
 	}
 
-
-	
 	/**
 	 * Returns inverted index in a pretty json format to string
+	 * 
 	 * @param elements map
-	 * @return string 
+	 * @return string
 	 */
 	public static String asQuerieStructure(Map<String, ? extends Collection<SingleQuerie>> elements) {
 		// THIS CODE IS PROVIDED FOR YOU; DO NOT MODIFY
@@ -441,18 +435,20 @@ public class SimpleJsonWriter {
 			StringWriter writer = new StringWriter();
 			asQuerieStructure(elements, writer, 0);
 			return writer.toString();
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			return null;
 		}
 	}
+
 	/**
 	 * Writes the inverted index in a pretty json format to a file
+	 * 
 	 * @param elements map
-	 * @param path used
+	 * @param path     used
 	 * @throws IOException exception
 	 */
-	public static void asQuerieStructure(Map<String, ? extends Collection<SingleQuerie>> elements, Path path) throws IOException {
+	public static void asQuerieStructure(Map<String, ? extends Collection<SingleQuerie>> elements, Path path)
+			throws IOException {
 		// THIS CODE IS PROVIDED FOR YOU; DO NOT MODIFY
 		try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
 			asQuerieStructure(elements, writer, 0);

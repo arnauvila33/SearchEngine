@@ -83,9 +83,8 @@ public class TextFileStemmer {
 	 * @see #uniqueStems(String, Stemmer)
 	 */
 	public static TreeSet<String> uniqueStems(String line) {
-		TreeSet<String> set = new TreeSet<String>();
 		Stemmer stemmer = new SnowballStemmer(DEFAULT);
-		stemIntoCollection(line, stemmer, set);
+		TreeSet<String> set = uniqueStems(line, stemmer);
 		return set;
 	}
 
