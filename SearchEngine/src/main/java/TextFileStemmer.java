@@ -126,4 +126,22 @@ public class TextFileStemmer {
 			}
 		}
 	}
+	
+	/* TODO 
+	public static ArrayList<String> listStems(Path inputFile) throws IOException {
+		ArrayList<String> list = 
+		stemFile...
+		return list
+	}
+	
+	public static void stemFile(Path inputFile, Collection<String> list) throws IOException {
+		Stemmer stemmer = new SnowballStemmer(DEFAULT);
+		try (BufferedReader reader = Files.newBufferedReader(inputFile, StandardCharsets.UTF_8);) {
+			String line = null;
+			while ((line = reader.readLine()) != null) {
+				stemIntoCollection(line, stemmer, list);
+			}
+		}
+	}
+	*/
 }

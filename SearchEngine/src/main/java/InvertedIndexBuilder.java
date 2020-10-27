@@ -22,9 +22,10 @@ public class InvertedIndexBuilder {
 		if (path != null && Files.isReadable(path) && Files.exists(path))
 			fillInvertedIndex(invertedIndex, path);
 		else
-			System.out.print("Please input a correct path");
+			System.out.print("Please input a correct path"); // TODO Remove the else and the output
 	}
 
+	// TODO Make fillInvertedIndex a static method, remove the constructor above, and call this method in Driver
 	/**
 	 * Method used to fill the inverted index with the path given.
 	 * 
@@ -39,6 +40,8 @@ public class InvertedIndexBuilder {
 			computeDirectory(invertedIndex, path);
 		}
 	}
+	
+	// TODO Make the methods below public (mostly for multithreading later)
 
 	/**
 	 * Used to compute a singleTxt file.
@@ -55,6 +58,25 @@ public class InvertedIndexBuilder {
 		for (String stems : input) {
 			invertedIndex.add(stems, inputPath.toString(), i++);
 		}
+		
+		/*
+		 * TODO This is a general solution that reuses your stemming code well. That is
+		 * always how you should initially solve a problem. When we refactor, we then ask,
+		 * is this general and reusable solution also the most efficient one? In this case,
+		 * it is not. Often, we will justify replicating logic/code to create a less-general
+		 * more-specific solution for the sake of efficiency.
+		 *
+		 * Go ahead and replicate most of the stemmer logic here in this code, except when
+		 * you have a stemmed word, immediately add to the index (never to a list). That
+		 * means:
+		 *
+		 * creating a snowball stemmer here
+		 * creating a buffered reader here and reading line-by-line
+		 * calling TextParser.parse to parse a line into words
+		 * stemming those words and adding them directly to the index (never a list)
+		 */
+
+		// TODO P.S. Keep your stemmer around. It is useful for projects 2 and 4.		
 	}
 
 	/**
@@ -90,6 +112,12 @@ public class InvertedIndexBuilder {
 						|| path.toString().toLowerCase().endsWith(".text")) {
 					list.add(path);
 				}
+				/* TODO 
+				 else {
+					 String lower = path.toString().toLowerCase();
+					 if (lower.endsWith(".txt") || lower.endsWith(".text")) {
+						list.add(path);
+					}*/
 			}
 			return list;
 		}

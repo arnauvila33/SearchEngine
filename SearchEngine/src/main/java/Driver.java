@@ -28,12 +28,26 @@ public class Driver {
 		InvertedIndex invertedIndex = new InvertedIndex();
 
 		if (argumentMap.hasFlag("-path")) {
+			// TODO Put inside a try/catch
 			new InvertedIndexBuilder(invertedIndex, argumentMap.getPath("-path"));
 		}
 		if (argumentMap.hasFlag("-index")) {
 			invertedIndex.toJson(argumentMap.getPath("-index", Paths.get("index.json")));
 		}
 
+		/* TODO 
+		if (argumentMap.hasFlag("-index")) {
+			Path path = argumentMap.getPath("-index", Paths.get("index.json"));
+			
+			try {
+				invertedIndex.toJson(path);
+			}
+			catch ( ) {
+				Unable to write to the json file at + path
+			}
+		}
+		*/
+		
 		// calculate time elapsed and output
 		Duration elapsed = Duration.between(start, Instant.now());
 		double seconds = (double) elapsed.toMillis() / Duration.ofSeconds(1).toMillis();

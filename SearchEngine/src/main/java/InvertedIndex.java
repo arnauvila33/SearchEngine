@@ -43,6 +43,7 @@ public class InvertedIndex {
 	 */
 	public boolean contains(String word) {
 		return !invertedIndex.isEmpty() && invertedIndex.containsKey(word);
+		// TODO return invertedIndex.containsKey(word);
 
 	}
 
@@ -56,7 +57,7 @@ public class InvertedIndex {
 	 * @return {@true} if the location and word is stored in the index
 	 */
 	public boolean contains(String word, String path) {
-		return contains(word) && invertedIndex.get(word).containsKey(path.toString());
+		return contains(word) && invertedIndex.get(word).containsKey(path);
 	}
 
 	/**
@@ -69,7 +70,7 @@ public class InvertedIndex {
 	 * @return {@true} if the location, word, and position is stored in the index
 	 */
 	public boolean contains(String word, String path, int position) {
-		return contains(word, path) && invertedIndex.get(word).get(path.toString()).contains(position);
+		return contains(word, path) && invertedIndex.get(word).get(path).contains(position);
 	}
 
 	/**
