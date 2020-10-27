@@ -1,3 +1,4 @@
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
@@ -16,9 +17,8 @@ public class Driver {
 	 * inverted index.
 	 *
 	 * @param args flag/value pairs used to start this program
-	 * @throws Exception exception
 	 */
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
 		// store initial start time
 		Instant start = Instant.now();
 
@@ -28,26 +28,22 @@ public class Driver {
 		InvertedIndex invertedIndex = new InvertedIndex();
 
 		if (argumentMap.hasFlag("-path")) {
-			// TODO Put inside a try/catch
-			new InvertedIndexBuilder(invertedIndex, argumentMap.getPath("-path"));
-		}
-		if (argumentMap.hasFlag("-index")) {
-			invertedIndex.toJson(argumentMap.getPath("-index", Paths.get("index.json")));
+			try {
+				InvertedIndexBuilder.fillInvertedIndex(invertedIndex, argumentMap.getPath("-path"));
+			} catch (Exception e) {
+				System.out.println("Unable to build inverted index from path: " + argumentMap.getPath("-path"));
+			}
 		}
 
-		/* TODO 
 		if (argumentMap.hasFlag("-index")) {
 			Path path = argumentMap.getPath("-index", Paths.get("index.json"));
-			
 			try {
 				invertedIndex.toJson(path);
-			}
-			catch ( ) {
-				Unable to write to the json file at + path
+			} catch (Exception e) {
+				System.out.println("Unable to write to the json file at" + path);
 			}
 		}
-		*/
-		
+
 		// calculate time elapsed and output
 		Duration elapsed = Duration.between(start, Instant.now());
 		double seconds = (double) elapsed.toMillis() / Duration.ofSeconds(1).toMillis();

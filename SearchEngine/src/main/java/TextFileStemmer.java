@@ -107,6 +107,19 @@ public class TextFileStemmer {
 	}
 
 	/**
+	 * ListStems uses the ste
+	 * 
+	 * @param inputFile stems the file passed.
+	 * @return the list stemmed
+	 * @throws IOException exception
+	 */
+	public static ArrayList<String> listStems(Path inputFile) throws IOException {
+		ArrayList<String> list = new ArrayList<String>();
+		stemFile(inputFile, list);
+		return list;
+	}
+
+	/**
 	 * Reads a file line by line, parses each line into cleaned and stemmed words,
 	 * and then adds those words to a set.
 	 *
@@ -117,23 +130,6 @@ public class TextFileStemmer {
 	 * @see #uniqueStems(String)
 	 * @see TextParser#parse(String)
 	 */
-	public static void listStems(Path inputFile, Collection<String> list) throws IOException {
-		Stemmer stemmer = new SnowballStemmer(DEFAULT);
-		try (BufferedReader reader = Files.newBufferedReader(inputFile, StandardCharsets.UTF_8);) {
-			String line = null;
-			while ((line = reader.readLine()) != null) {
-				stemIntoCollection(line, stemmer, list);
-			}
-		}
-	}
-	
-	/* TODO 
-	public static ArrayList<String> listStems(Path inputFile) throws IOException {
-		ArrayList<String> list = 
-		stemFile...
-		return list
-	}
-	
 	public static void stemFile(Path inputFile, Collection<String> list) throws IOException {
 		Stemmer stemmer = new SnowballStemmer(DEFAULT);
 		try (BufferedReader reader = Files.newBufferedReader(inputFile, StandardCharsets.UTF_8);) {
@@ -143,5 +139,5 @@ public class TextFileStemmer {
 			}
 		}
 	}
-	*/
+
 }

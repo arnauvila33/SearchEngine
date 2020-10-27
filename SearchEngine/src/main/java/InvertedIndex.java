@@ -42,8 +42,7 @@ public class InvertedIndex {
 	 * @return {@true} if the location is stored in the index
 	 */
 	public boolean contains(String word) {
-		return !invertedIndex.isEmpty() && invertedIndex.containsKey(word);
-		// TODO return invertedIndex.containsKey(word);
+		return invertedIndex.containsKey(word);
 
 	}
 

@@ -61,11 +61,11 @@ public class SimpleJsonWriter {
 		writer.write("{");
 		Iterator<Entry<String, Integer>> iterator = elements.entrySet().iterator();
 		if (iterator.hasNext()) {
-			writeEntry(iterator.next(), writer, level); // TODO level + 1
+			writeEntry(iterator.next(), writer, level+1); 
 		}
 		while (iterator.hasNext()) {
 			writer.write(",\n");
-			writeEntry(iterator.next(), writer, level); // TODO level + 1
+			writeEntry(iterator.next(), writer, level+1); 
 		}
 		writer.write("\n}");
 
