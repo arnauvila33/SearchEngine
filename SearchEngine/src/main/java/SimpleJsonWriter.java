@@ -64,7 +64,7 @@ public class SimpleJsonWriter {
 			writeEntry(iterator.next(), writer, level+1); 
 		}
 		while (iterator.hasNext()) {
-			writer.write(",\n");
+			writer.write(",");
 			writeEntry(iterator.next(), writer, level+1); 
 		}
 		writer.write("\n}");
@@ -135,7 +135,90 @@ public class SimpleJsonWriter {
 
 		writer.write("\n}");
 	}
+	/**
+	 * Writes the Querie search as a pretty JSON file
+	 * 
+	 * @param elements the data structure that holds the querie results
+	 * @param writer   the writer used
+	 * @param level    the indent level
+	 * @throws IOException exception
+	 */
+	public static void asQuerieStructure(Map<String, ? extends Collection<SingleQuerie>> elements, Writer writer,
+			int level) throws IOException {
+		indent(writer, level);
+		writer.write("{");
+		writer.write("\n");
+		var iterator = elements.entrySet().iterator();
+		Entry<String, ? extends Collection<SingleQuerie>> entry;
+		if (iterator.hasNext()) {
+			entry = iterator.next();
+			indent(entry.getKey(), writer, level + 1);
+			writer.write(": ");
+			asArrayQuerie(entry.getValue(), writer, level + 1);
+		}
+		while (iterator.hasNext()) {
+			entry = iterator.next();
+			writer.write(",");
+			writer.write("\n");
+			indent(entry.getKey(), writer, level + 1);
+			writer.write(": ");
+			asArrayQuerie(entry.getValue(), writer, level + 1);
+		}
 
+		writer.write("\n}");
+	}
+	/**
+	 * Writes the elements as a pretty JSON array.
+	 *
+	 * @param elements the elements to write
+	 * @param writer   the writer to use
+	 * @param level    the initial indent level
+	 * @throws IOException if an IO error occurs
+	 */
+	public static void asArrayQuerie(Collection<SingleQuerie> elements, Writer writer, int level) throws IOException {
+
+		writer.write("[");
+		Iterator<SingleQuerie> iterator = elements.iterator();
+		if (iterator.hasNext()) {
+			asQuerie(iterator.next(), writer, level);
+		}
+		while (iterator.hasNext()) {
+			writer.write(",");
+			asQuerie(iterator.next(), writer, level);
+		}
+		writer.write("\n");
+		indent(writer, level);
+		writer.write("]");
+	}
+
+
+	/**
+	 * Writes the querie as a pretty json file
+	 * 
+	 * @param querie the querie object to write
+	 * @param writer the writer used
+	 * @param level  the indent level passed
+	 * @throws IOException exception
+	 */
+	public static void asQuerie(SingleQuerie querie, Writer writer, int level) throws IOException {
+		writer.write("\n");
+		indent(writer, level + 1);
+		writer.write("{\n");
+		indent("where", writer, level + 2);
+		writer.write(": ");
+		writer.write('"' + querie.where + '"');
+		writer.write(",\n");
+		indent("count", writer, level + 2);
+		writer.write(": ");
+		writer.write(String.valueOf(querie.count));
+		writer.write(",\n");
+		indent("score", writer, level + 2);
+		writer.write(": ");
+		writer.write(String.format("%.8f", querie.score));
+		writer.write("\n");
+		indent(writer, level + 1);
+		writer.write("}");
+	}
 	/**
 	 * Indents using a tab character by the number of times specified.
 	 *
@@ -308,6 +391,37 @@ public class SimpleJsonWriter {
 			throws IOException {
 		try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
 			asInvertedIndex(map, writer, 0);
+		}
+	}
+	/**
+	 * Returns inverted index in a pretty json format to string
+	 * 
+	 * @param elements map
+	 * @return string
+	 */
+	public static String asQuerieStructure(Map<String, ? extends Collection<SingleQuerie>> elements) {
+		// THIS CODE IS PROVIDED FOR YOU; DO NOT MODIFY
+		try {
+			StringWriter writer = new StringWriter();
+			asQuerieStructure(elements, writer, 0);
+			return writer.toString();
+		} catch (IOException e) {
+			return null;
+		}
+	}
+
+	/**
+	 * Writes the inverted index in a pretty json format to a file
+	 * 
+	 * @param elements map
+	 * @param path     used
+	 * @throws IOException exception
+	 */
+	public static void asQuerieStructure(Map<String, ? extends Collection<SingleQuerie>> elements, Path path)
+			throws IOException {
+		// THIS CODE IS PROVIDED FOR YOU; DO NOT MODIFY
+		try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
+			asQuerieStructure(elements, writer, 0);
 		}
 	}
 
