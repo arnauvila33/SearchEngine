@@ -116,6 +116,11 @@ public class InvertedIndex {
 			return Collections.emptySet();
 	}
 	
+	/**
+	 * Returns the counts of the word given
+	 * @param word to find count
+	 * @return Integer
+	 */
 	public Integer getCount(String word) {
 		return countMap.get(word);
 	}
@@ -161,6 +166,11 @@ public class InvertedIndex {
 		SimpleJsonWriter.asinvertedIndex(invertedIndex, path);
 	}
 	
+	/**
+	 * Prints the count to the path given as a JSON file.
+	 * @param path path to use to print
+	 * @throws IOException exception
+	 */
 	public void countToJason(Path path) throws IOException {
 		SimpleJsonWriter.asObject(countMap, path);
 	}

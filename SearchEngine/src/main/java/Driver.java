@@ -36,7 +36,6 @@ public class Driver {
 				System.out.println("Unable to build inverted index from path: " + argumentMap.getPath("-path"));
 			}
 		}
-
 		if (argumentMap.hasFlag("-index")) {
 			Path path = argumentMap.getPath("-index", Paths.get("index.json"));
 			try {

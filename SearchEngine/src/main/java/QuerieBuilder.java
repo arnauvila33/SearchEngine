@@ -8,18 +8,25 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.TreeSet;
 
+/**
+ * QuerieBuilder class builds the QuerieStructure passed
+ * 
+ * @author arnau
+ *
+ */
 public class QuerieBuilder {
 
-	public QuerieBuilder(QuerieStructure querie, InvertedIndex invertedIndex, Path path, boolean exact)
-			throws IOException {
-		if (path != null && Files.isReadable(path) && Files.exists(path)) {
-			processQuerie(querie, invertedIndex, path, exact);
-		} else
-			System.out.print("Please input a correct querie path");
+	/**
+	 * Process Querie processes the querie with one thread.
+	 * 
+	 * @param querieStructure The querie structure to build to.
+	 * @param invertedIndex   invertedIndex to use to search.
+	 * @param path            path used to read querie
+	 * @param exact           boolean that determines exact/partial Search
+	 * @throws IOException exception
+	 */
 
-	}
-
-	public static void processQuerie(QuerieStructure querieSearchList, InvertedIndex invertedIndex, Path path,
+	public static void processQuerie(QuerieStructure querieStructure, InvertedIndex invertedIndex, Path path,
 			boolean exact) throws IOException {
 
 		BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);
@@ -34,12 +41,20 @@ public class QuerieBuilder {
 				TreeSet<String> words = getWordsList(list, exact, invertedIndex);
 				TreeSet<String> paths = getPathList(words, invertedIndex);
 				queries = search(words, paths, invertedIndex);
-				querieSearchList.add(QuerieString, queries);
+				querieStructure.add(QuerieString, queries);
 			}
 		}
 
 	}
 
+	/**
+	 * Search method used to build querie Structure
+	 * 
+	 * @param words         words passed to search
+	 * @param paths         paths passed to search in
+	 * @param invertedIndex the invertedIndex strucure used to find other words.
+	 * @return ArrayList with the queries found
+	 */
 	public static ArrayList<SingleQuerie> search(TreeSet<String> words, TreeSet<String> paths,
 			InvertedIndex invertedIndex) {
 		ArrayList<SingleQuerie> querieResults = new ArrayList<SingleQuerie>();
@@ -61,6 +76,28 @@ public class QuerieBuilder {
 		return querieResults;
 	}
 
+	/**
+	 * gets the word list of words to find.
+	 * 
+	 * @param querie        the words to find
+	 * @param exact         Determines if it is exact/partial search
+	 * @param invertedIndex structure to search.
+	 * @return the set of words.
+	 */
+	private static TreeSet<String> getWordsList(TreeSet<String> querie, boolean exact, InvertedIndex invertedIndex) {
+		if (exact)
+			return querie;
+		else
+			return getPartialWords(querie, invertedIndex);
+	}
+
+	/**
+	 * Returns partial words for partial search.
+	 * 
+	 * @param querie        querie passed
+	 * @param invertedIndex structure to search
+	 * @return the set of partial words.
+	 */
 	private static TreeSet<String> getPartialWords(TreeSet<String> querie, InvertedIndex invertedIndex) {
 		TreeSet<String> foundWords = new TreeSet<String>();
 		for (String word : invertedIndex.get()) {
@@ -73,13 +110,13 @@ public class QuerieBuilder {
 		return foundWords;
 	}
 
-	private static TreeSet<String> getWordsList(TreeSet<String> querie, boolean exact, InvertedIndex invertedIndex) {
-		if (exact)
-			return querie;
-		else
-			return getPartialWords(querie, invertedIndex);
-	}
-
+	/**
+	 * Returns the list of paths of the words passed.
+	 * 
+	 * @param words         used to find their respective paths.
+	 * @param invertedIndex structure to search.
+	 * @return the set of paths
+	 */
 	private static TreeSet<String> getPathList(TreeSet<String> words, InvertedIndex invertedIndex) {
 		TreeSet<String> foundpaths = new TreeSet<String>();
 		for (String word : words) {
