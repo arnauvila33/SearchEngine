@@ -1,12 +1,18 @@
 import java.util.*;
-
+/**
+ * Single Querie class is the structure to hold one querie.
+ * @author arnau
+ *
+ */
 public class SingleQuerie implements Comparable<SingleQuerie>{
 	public String where;
 	public int count;
 	public double score;
 	
 
-	
+	/**
+	 * Querie map used to print to json.
+	 */
 	Map<String,Object> querie=new HashMap<String,Object>();
 	
 	/**

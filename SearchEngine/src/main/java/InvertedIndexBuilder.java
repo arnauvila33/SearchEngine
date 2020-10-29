@@ -32,6 +32,55 @@ public class InvertedIndexBuilder {
 		}
 	}
 
+	public static void fillInvertedIndexMultithread(InvertedIndex invertedIndex, Path inputPath, int threads)
+			throws IOException {
+		WorkQueue queue = new WorkQueue(threads);
+		if (Files.isDirectory(inputPath)) {
+			ArrayList<Path> pathList = new ArrayList<Path>();
+			pathList = traverseDirectory(inputPath, pathList);
+			for (Path path : pathList) {
+				queue.execute(new Task(path, invertedIndex));
+			}
+		} else {
+			queue.execute(new Task(inputPath, invertedIndex));
+		}
+		queue.join();
+	}
+
+	/**
+	 * Task class that Builds the invertedIndex using multithreading.
+	 * 
+	 * @author arnau
+	 *
+	 */
+	private static class Task implements Runnable {
+		/** The path to add or list. */
+		private final Path path;
+		private final InvertedIndex invertedIndex;
+
+		/**
+		 * Initializes this task.
+		 *
+		 * @param path the path to add or list
+		 */
+		public Task(Path path, InvertedIndex invertedIndex) {
+			this.path = path;
+			this.invertedIndex = invertedIndex;
+		}
+
+		@Override
+		public void run() {
+			try {
+				synchronized (invertedIndex) {
+					computeSingleFile(invertedIndex, path);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+		}
+	}
+
 	/**
 	 * Used to compute a singleTxt file.
 	 * 

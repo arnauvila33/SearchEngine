@@ -30,35 +30,55 @@ public class Driver {
 		QuerieStructure querieStructure = new QuerieStructure();
 
 		if (argumentMap.hasFlag("-path")) {
-			try {
-				InvertedIndexBuilder.fillInvertedIndex(invertedIndex, argumentMap.getPath("-path"));
-			} catch (Exception e) {
-				System.out.println("Unable to build inverted index from path: " + argumentMap.getPath("-path"));
+			if (argumentMap.hasFlag("-threads")) {
+				try {
+					InvertedIndexBuilder.fillInvertedIndexMultithread(invertedIndex, argumentMap.getPath("-path"),
+							argumentMap.getInteger("-threads", 5));
+				} catch (Exception e) {
+					System.out.println("Unable to build inverted index from path: " + argumentMap.getPath("-path"));
+				}
+			} else {
+				try {
+					InvertedIndexBuilder.fillInvertedIndex(invertedIndex, argumentMap.getPath("-path"));
+				} catch (Exception e) {
+					System.out.println("Unable to build inverted index from path: " + argumentMap.getPath("-path"));
+				}
 			}
 		}
-
+		if (argumentMap.hasFlag("-queries")) {
+			if (argumentMap.hasFlag("-threads")) {
+				try {
+					QuerieBuilder.processQuerieMultithreading(querieStructure, invertedIndex,
+							argumentMap.getPath("-queries"), argumentMap.hasFlag("-exact"),
+							argumentMap.getInteger("-threads", 5));
+				} catch (Exception e) {
+					System.out.println("Unable to build inverted index from path: " + argumentMap.getPath("-path"));
+				}
+			} else {
+				try {
+					QuerieBuilder.processQuerie(querieStructure, invertedIndex, argumentMap.getPath("-queries"),
+							argumentMap.hasFlag("-exact"));
+				} catch (Exception e) {
+					System.out.println("Unable to build querie from path" + argumentMap.getPath("-queries"));
+				}
+			}
+		}
 		if (argumentMap.hasFlag("-index")) {
 			Path path = argumentMap.getPath("-index", Paths.get("index.json"));
 			try {
 				invertedIndex.toJson(path);
 			} catch (Exception e) {
-				System.out.println("Unable to write to the json file at" + path);
+				e.printStackTrace();
+				System.out.println("Unable to write to the json file at " + path);
 			}
 		}
-		if (argumentMap.hasFlag("-queries")) {
-			try {
-				QuerieBuilder.processQuerie(querieStructure, invertedIndex, argumentMap.getPath("-queries"),
-						argumentMap.hasFlag("-exact"));
-			} catch (Exception e) {
-				System.out.println("Unable to build querie from path" + argumentMap.getPath("-queries"));
-			}
-		}
+		
 		if (argumentMap.hasFlag("-results")) {
 			Path path = argumentMap.getPath("-results", Paths.get("results.json"));
 			try {
 				querieStructure.toJson(path);
 			} catch (Exception e) {
-				System.out.println("Unable to write to the json file at" + path);
+				System.out.println("Unable to write to the json file at " + path);
 			}
 		}
 		if (argumentMap.hasFlag("-counts")) {
@@ -66,7 +86,7 @@ public class Driver {
 			try {
 				invertedIndex.countToJason(path);
 			} catch (Exception e) {
-				System.out.println("Unable to write to the json file at" + path);
+				System.out.println("Unable to write to the json file at " + path);
 			}
 		}
 

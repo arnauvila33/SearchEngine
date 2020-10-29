@@ -61,11 +61,11 @@ public class SimpleJsonWriter {
 		writer.write("{");
 		Iterator<Entry<String, Integer>> iterator = elements.entrySet().iterator();
 		if (iterator.hasNext()) {
-			writeEntry(iterator.next(), writer, level+1); 
+			writeEntry(iterator.next(), writer, level + 1);
 		}
 		while (iterator.hasNext()) {
 			writer.write(",");
-			writeEntry(iterator.next(), writer, level+1); 
+			writeEntry(iterator.next(), writer, level + 1);
 		}
 		writer.write("\n}");
 
@@ -135,6 +135,7 @@ public class SimpleJsonWriter {
 
 		writer.write("\n}");
 	}
+
 	/**
 	 * Writes the Querie search as a pretty JSON file
 	 * 
@@ -167,6 +168,7 @@ public class SimpleJsonWriter {
 
 		writer.write("\n}");
 	}
+
 	/**
 	 * Writes the elements as a pretty JSON array.
 	 *
@@ -190,7 +192,6 @@ public class SimpleJsonWriter {
 		indent(writer, level);
 		writer.write("]");
 	}
-
 
 	/**
 	 * Writes the querie as a pretty json file
@@ -219,6 +220,7 @@ public class SimpleJsonWriter {
 		indent(writer, level + 1);
 		writer.write("}");
 	}
+
 	/**
 	 * Indents using a tab character by the number of times specified.
 	 *
@@ -393,6 +395,7 @@ public class SimpleJsonWriter {
 			asInvertedIndex(map, writer, 0);
 		}
 	}
+
 	/**
 	 * Returns inverted index in a pretty json format to string
 	 * 

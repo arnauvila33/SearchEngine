@@ -6,46 +6,93 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
+/**
+ * Querie structure class that holds the queries found.
+ * @author arnau
+ *
+ */
 public class QuerieStructure {
-
-	private final Map<String, ArrayList<SingleQuerie>> querieSearchList;
-
+	
+	/**
+	 * Querie sturcture to hold single queries
+	 */
+	private final Map<String, ArrayList<SingleQuerie>> querieStructure;
+	
+	/**
+	 * Constructor
+	 */
 	public QuerieStructure() {
-		querieSearchList = new TreeMap<String, ArrayList<SingleQuerie>>();
+		querieStructure = new TreeMap<String, ArrayList<SingleQuerie>>();
 	}
-
+	
+	/**
+	 * Adds word and querie list to the structure
+	 * @param word to add
+	 * @param queries list to add to that word
+	 */
 	public void add(String word, ArrayList<SingleQuerie> queries) {
-		querieSearchList.put(word, queries);
+		querieStructure.put(word, queries);
 	}
-
-	public boolean contains(String words) {
-		return !querieSearchList.isEmpty() && querieSearchList.containsKey(words);
+	
+	/**
+	 * Contains method to see if it contains a word
+	 * @param word to check if it's in the structure
+	 * @return boolean
+	 */
+	public boolean contains(String word) {
+		return querieStructure.containsKey(word);
 	}
-
+	
+	/**
+	 * 
+	 * @param words
+	 * @param querie
+	 * @return
+	 */
 	public boolean contains(String words, SingleQuerie querie) {
-		return contains(words) && querieSearchList.get(words).contains(querie);
+		return contains(words) && querieStructure.get(words).contains(querie);
 	}
-
+	
+	/**
+	 * Returns the set of words in the structure.
+	 * @return the set of words in the structure.
+	 */
 	public Collection<String> get() {
-		return Collections.unmodifiableCollection(querieSearchList.keySet());
+		return Collections.unmodifiableCollection(querieStructure.keySet());
 	}
-
+	
+	/**
+	 * Returns the list of single queries
+	 * @param words to use
+	 * @return the list of single queries
+	 */
 	public Collection<SingleQuerie> get(String words) {
 		if (contains(words)) {
-			return Collections.unmodifiableCollection(querieSearchList.get(words));
+			return Collections.unmodifiableCollection(querieStructure.get(words));
 		}
 		return Collections.emptySet();
 	}
-
+	/**
+	 * Size of structure
+	 * @return int
+	 */
 	public int size() {
-		return querieSearchList.size();
+		return querieStructure.size();
 	}
-
+	/**
+	 * Size of list of word
+	 * @param words to use
+	 * @return int
+	 */
 	public int size(String words) {
 		return get(words).size();
 	}
-
+	/**
+	 * Prints it to JSON
+	 * @param path to print to
+	 * @throws IOException exception
+	 */
 	public void toJson(Path path) throws IOException {
-		SimpleJsonWriter.asQuerieStructure(querieSearchList, path);
+		SimpleJsonWriter.asQuerieStructure(querieStructure, path);
 	}
 }

@@ -14,10 +14,9 @@ public class InvertedIndex {
 
 	/** map where values are stored */
 	private final TreeMap<String, TreeMap<String, TreeSet<Integer>>> invertedIndex;
-	
+
 	/** map where count is stored */
 	private static TreeMap<String, Integer> countMap;
-
 
 	/**
 	 * Constructor for Inverted Index
@@ -115,10 +114,11 @@ public class InvertedIndex {
 		} else
 			return Collections.emptySet();
 	}
-	
+
 	public Integer getCount(String word) {
 		return countMap.get(word);
 	}
+
 	/**
 	 * Returns the number of words stored in the index.
 	 *
@@ -161,6 +161,11 @@ public class InvertedIndex {
 		SimpleJsonWriter.asinvertedIndex(invertedIndex, path);
 	}
 	
+	/**
+	 * Prints the counts to the path givem
+	 * @param path the path to print counts to.
+	 * @throws IOException exception
+	 */
 	public void countToJason(Path path) throws IOException {
 		SimpleJsonWriter.asObject(countMap, path);
 	}
