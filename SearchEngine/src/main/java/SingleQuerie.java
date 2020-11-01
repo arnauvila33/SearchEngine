@@ -22,11 +22,6 @@ public class SingleQuerie implements Comparable<SingleQuerie> {
 	public double score;
 
 	/**
-	 * Querie map used to print to json.
-	 */
-	Map<String, Object> querie = new HashMap<String, Object>();
-
-	/**
 	 * Constructor method
 	 * 
 	 * @param where the path
@@ -37,9 +32,6 @@ public class SingleQuerie implements Comparable<SingleQuerie> {
 		this.where = where;
 		this.count = count;
 		this.score = score;
-		querie.put("where: ", where);
-		querie.put("count: ", count);
-		querie.put("score: ", score);
 	}
 
 	/**

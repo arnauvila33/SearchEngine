@@ -48,7 +48,7 @@ public class QuerieStructure {
 
 	/**
 	 * 
-	 * @param words words used
+	 * @param words  words used
 	 * @param querie querie used
 	 * @return boolean
 	 */
