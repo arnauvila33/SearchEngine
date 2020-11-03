@@ -14,6 +14,12 @@ import java.util.TreeMap;
  */
 public class QuerieStructure {
 
+	/*
+	 * TODO Combine together QuerieBuilder and QuerieStructure
+	 * 
+	 * ... non-static methods
+	 */
+	
 	/**
 	 * Querie sturcture to hold single queries
 	 */
