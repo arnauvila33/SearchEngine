@@ -27,7 +27,7 @@ public class Driver {
 		// InvertedIndex object
 		InvertedIndex invertedIndex = new InvertedIndex();
 		// QuerieStructure object
-		QuerieStructure querieStructure = new QuerieStructure();
+		QuerieStructure querieStructure = new QuerieStructure(); // TODO Query
 
 		if (argumentMap.hasFlag("-path")) {
 			try {

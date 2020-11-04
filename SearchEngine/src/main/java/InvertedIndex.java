@@ -16,7 +16,7 @@ public class InvertedIndex {
 	private final TreeMap<String, TreeMap<String, TreeSet<Integer>>> invertedIndex;
 
 	/** map where count is stored */
-	private static TreeMap<String, Integer> countMap;
+	private static TreeMap<String, Integer> countMap; // TODO change static to final
 
 	/**
 	 * Constructor for Inverted Index
@@ -37,6 +37,23 @@ public class InvertedIndex {
 		invertedIndex.putIfAbsent(word, new TreeMap<>());
 		invertedIndex.get(word).putIfAbsent(location, new TreeSet<>());
 		invertedIndex.get(word).get(location).add(position);
+		
+		/*
+		 * TODO
+		 * add(hello, hello.txt, 5); <--- increase the word count
+		 * add(hello, hello.txt, 5); <--- should not increase the word count
+		 * 
+
+		boolean result = invertedIndex.get(word).get(location).add(position);
+		
+		if (result) {
+			then update the count
+			
+			could OPTIONALLY do:
+			https://docs.oracle.com/en/java/javase/14/docs/api/java.base/java/util/Map.html#merge(K,V,java.util.function.BiFunction)
+		}
+
+		 */
 		countMap.putIfAbsent(location, 0);
 		countMap.replace(location, countMap.get(location) + 1);
 	}
@@ -173,7 +190,7 @@ public class InvertedIndex {
 	 * @param path path to use to print
 	 * @throws IOException exception
 	 */
-	public void countToJason(Path path) throws IOException {
+	public void countToJason(Path path) throws IOException { // TODO Json
 		SimpleJsonWriter.asObject(countMap, path);
 	}
 
@@ -182,4 +199,13 @@ public class InvertedIndex {
 		return invertedIndex.toString();
 	}
 
+	/* TODO 
+	public List<SingleQuerie> exactSearch(Set<String> queryWords) {
+		
+	}
+	
+	public List<SingleQuerie> partialSearch(Set<String> queryWords) {
+		
+	}
+	*/
 }
