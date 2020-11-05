@@ -27,7 +27,7 @@ public class Driver {
 		// InvertedIndex object
 		InvertedIndex invertedIndex = new InvertedIndex();
 		// QuerieStructure object
-		QuerieStructure querieStructure = new QuerieStructure(); // TODO Query
+		QueryStructure queryStructure=new QueryStructure();
 
 		if (argumentMap.hasFlag("-path")) {
 			try {
@@ -46,7 +46,7 @@ public class Driver {
 		}
 		if (argumentMap.hasFlag("-queries")) {
 			try {
-				QuerieBuilder.processQuerie(querieStructure, invertedIndex, argumentMap.getPath("-queries"),
+				queryStructure.processQuerie(invertedIndex, argumentMap.getPath("-queries"),
 						argumentMap.hasFlag("-exact"));
 			} catch (Exception e) {
 				System.out.println("Unable to build querie from path" + argumentMap.getPath("-queries"));
@@ -55,7 +55,7 @@ public class Driver {
 		if (argumentMap.hasFlag("-results")) {
 			Path path = argumentMap.getPath("-results", Paths.get("results.json"));
 			try {
-				querieStructure.toJson(path);
+				queryStructure.toJson(path);
 			} catch (Exception e) {
 				System.out.println("Unable to write to the json file at" + path);
 			}
@@ -63,7 +63,7 @@ public class Driver {
 		if (argumentMap.hasFlag("-counts")) {
 			Path path = argumentMap.getPath("-counts", Paths.get("counts.json"));
 			try {
-				invertedIndex.countToJason(path);
+				invertedIndex.countToJson(path);
 			} catch (Exception e) {
 				System.out.println("Unable to write to the json file at" + path);
 			}

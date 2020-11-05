@@ -61,11 +61,11 @@ public class SimpleJsonWriter {
 		writer.write("{");
 		Iterator<Entry<String, Integer>> iterator = elements.entrySet().iterator();
 		if (iterator.hasNext()) {
-			writeEntry(iterator.next(), writer, level+1); 
+			writeEntry(iterator.next(), writer, level + 1);
 		}
 		while (iterator.hasNext()) {
 			writer.write(",");
-			writeEntry(iterator.next(), writer, level+1); 
+			writeEntry(iterator.next(), writer, level + 1);
 		}
 		writer.write("\n}");
 
@@ -135,21 +135,24 @@ public class SimpleJsonWriter {
 
 		writer.write("\n}");
 	}
+
 	/**
 	 * Writes the Querie search as a pretty JSON file
 	 * 
-	 * @param elements the data structure that holds the querie results
-	 * @param writer   the writer used
-	 * @param level    the indent level
+	 * 
+	 * @param elements      the data structure that holds the querie results
+	 * @param writer        the writer used
+	 * @param level         the indent level
 	 * @throws IOException exception
 	 */
-	public static void asQuerieStructure(Map<String, ? extends Collection<SingleQuerie>> elements, Writer writer,
-			int level) throws IOException {
+	public static <SingleQuery> void asQuerieStructure(
+			Map<String, ? extends Collection<InvertedIndex.SingleQuery>> elements, Writer writer, int level)
+			throws IOException {
 		indent(writer, level);
 		writer.write("{");
 		writer.write("\n");
 		var iterator = elements.entrySet().iterator();
-		Entry<String, ? extends Collection<SingleQuerie>> entry;
+		Entry<String, ? extends Collection<InvertedIndex.SingleQuery>> entry;
 		if (iterator.hasNext()) {
 			entry = iterator.next();
 			indent(entry.getKey(), writer, level + 1);
@@ -167,6 +170,7 @@ public class SimpleJsonWriter {
 
 		writer.write("\n}");
 	}
+
 	/**
 	 * Writes the elements as a pretty JSON array.
 	 *
@@ -175,10 +179,11 @@ public class SimpleJsonWriter {
 	 * @param level    the initial indent level
 	 * @throws IOException if an IO error occurs
 	 */
-	public static void asArrayQuerie(Collection<SingleQuerie> elements, Writer writer, int level) throws IOException {
+	public static void asArrayQuerie(Collection<InvertedIndex.SingleQuery> elements, Writer writer, int level)
+			throws IOException {
 
 		writer.write("[");
-		Iterator<SingleQuerie> iterator = elements.iterator();
+		Iterator<InvertedIndex.SingleQuery> iterator = elements.iterator();
 		if (iterator.hasNext()) {
 			asQuerie(iterator.next(), writer, level);
 		}
@@ -191,7 +196,6 @@ public class SimpleJsonWriter {
 		writer.write("]");
 	}
 
-
 	/**
 	 * Writes the querie as a pretty json file
 	 * 
@@ -200,7 +204,7 @@ public class SimpleJsonWriter {
 	 * @param level  the indent level passed
 	 * @throws IOException exception
 	 */
-	public static void asQuerie(SingleQuerie querie, Writer writer, int level) throws IOException {
+	public static void asQuerie(InvertedIndex.SingleQuery querie, Writer writer, int level) throws IOException {
 		writer.write("\n");
 		indent(writer, level + 1);
 		writer.write("{\n");
@@ -219,6 +223,7 @@ public class SimpleJsonWriter {
 		indent(writer, level + 1);
 		writer.write("}");
 	}
+
 	/**
 	 * Indents using a tab character by the number of times specified.
 	 *
@@ -393,13 +398,14 @@ public class SimpleJsonWriter {
 			asInvertedIndex(map, writer, 0);
 		}
 	}
+
 	/**
 	 * Returns inverted index in a pretty json format to string
 	 * 
 	 * @param elements map
 	 * @return string
 	 */
-	public static String asQuerieStructure(Map<String, ? extends Collection<SingleQuerie>> elements) {
+	public static String asQuerieStructure(Map<String, ? extends Collection<InvertedIndex.SingleQuery>> elements) {
 		// THIS CODE IS PROVIDED FOR YOU; DO NOT MODIFY
 		try {
 			StringWriter writer = new StringWriter();
@@ -417,8 +423,8 @@ public class SimpleJsonWriter {
 	 * @param path     used
 	 * @throws IOException exception
 	 */
-	public static void asQuerieStructure(Map<String, ? extends Collection<SingleQuerie>> elements, Path path)
-			throws IOException {
+	public static void asQuerieStructure(Map<String, ? extends Collection<InvertedIndex.SingleQuery>> elements,
+			Path path) throws IOException {
 		// THIS CODE IS PROVIDED FOR YOU; DO NOT MODIFY
 		try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
 			asQuerieStructure(elements, writer, 0);

@@ -16,7 +16,10 @@ public class InvertedIndex {
 	private final TreeMap<String, TreeMap<String, TreeSet<Integer>>> invertedIndex;
 
 	/** map where count is stored */
-	private static TreeMap<String, Integer> countMap; // TODO change static to final
+	private final TreeMap<String, Integer> countMap; 
+	
+	
+	
 
 	/**
 	 * Constructor for Inverted Index
@@ -24,6 +27,7 @@ public class InvertedIndex {
 	public InvertedIndex() {
 		invertedIndex = new TreeMap<String, TreeMap<String, TreeSet<Integer>>>();
 		countMap = new TreeMap<String, Integer>();
+
 	}
 
 	/**
@@ -36,26 +40,14 @@ public class InvertedIndex {
 	public void add(String word, String location, int position) {
 		invertedIndex.putIfAbsent(word, new TreeMap<>());
 		invertedIndex.get(word).putIfAbsent(location, new TreeSet<>());
-		invertedIndex.get(word).get(location).add(position);
-		
-		/*
-		 * TODO
-		 * add(hello, hello.txt, 5); <--- increase the word count
-		 * add(hello, hello.txt, 5); <--- should not increase the word count
-		 * 
-
 		boolean result = invertedIndex.get(word).get(location).add(position);
-		
+
+		countMap.putIfAbsent(location, 0);
 		if (result) {
-			then update the count
-			
-			could OPTIONALLY do:
-			https://docs.oracle.com/en/java/javase/14/docs/api/java.base/java/util/Map.html#merge(K,V,java.util.function.BiFunction)
+			countMap.replace(location, countMap.get(location) + 1);
+			// https://docs.oracle.com/en/java/javase/14/docs/api/java.base/java/util/Map.html#merge(K,V,java.util.function.BiFunction)
 		}
 
-		 */
-		countMap.putIfAbsent(location, 0);
-		countMap.replace(location, countMap.get(location) + 1);
 	}
 
 	/**
@@ -190,7 +182,7 @@ public class InvertedIndex {
 	 * @param path path to use to print
 	 * @throws IOException exception
 	 */
-	public void countToJason(Path path) throws IOException { // TODO Json
+	public void countToJson(Path path) throws IOException { 
 		SimpleJsonWriter.asObject(countMap, path);
 	}
 
@@ -198,14 +190,129 @@ public class InvertedIndex {
 	public String toString() {
 		return invertedIndex.toString();
 	}
+	
+	/**
+	 * SingleQuery class
+	 * @author arnau
+	 *
+	 */
+	class SingleQuery implements Comparable<SingleQuery>{
 
-	/* TODO 
-	public List<SingleQuerie> exactSearch(Set<String> queryWords) {
-		
+		/**
+		 * where
+		 */
+		public String where;
+		/**
+		 * count
+		 */
+		public int count;
+		/**
+		 * score
+		 */
+		public double score;
+
+		/**
+		 * Constructor method
+		 * 
+		 * @param where the path
+		 * @param count the count of words
+		 * @param score the score
+		 */
+		public SingleQuery(String where, int count, double score) {
+			this.where = where;
+			this.count = count;
+			this.score = score;
+		}
+
+		/**
+		 * CompareTo method adapted to the class
+		 * 
+		 * @param list the list to compare to
+		 * @return The int used to sort
+		 */
+		@Override
+		public int compareTo(SingleQuery list) {
+			if (Double.compare(score, list.score) != 0)
+				return Double.compare(list.score, score);
+			if (Integer.compare(count, list.count) != 0)
+				return Integer.compare(list.count, count);
+			if (where.compareToIgnoreCase(list.where.toLowerCase()) != 0)
+				return where.compareToIgnoreCase(list.where.toLowerCase());
+			return 0;
+		}
 	}
 	
-	public List<SingleQuerie> partialSearch(Set<String> queryWords) {
-		
+	/**
+	 * Search method used to build querie Structure
+	 * 
+	 * @param words         words passed to search
+	 * @param paths         paths passed to search in
+	 * @return ArrayList with the queries found
+	 */
+	public ArrayList<SingleQuery> search(TreeSet<String> words, TreeSet<String> paths) {
+		ArrayList<SingleQuery> querieResults = new ArrayList<SingleQuery>();
+
+		Iterator<String> pathsIterator = paths.iterator();
+		while (pathsIterator.hasNext()) {
+			String where = pathsIterator.next();
+			int count = 0;
+			for (String word : words) {
+				if (get(word).contains(where)) {
+					count += size(word, where);
+				}
+			}
+			double score = (double) count / (double) getCount(where);
+			SingleQuery querieTemp = new SingleQuery(where, count, score);
+			querieResults.add(querieTemp);
+		}
+		Collections.sort(querieResults);
+		return querieResults;
 	}
-	*/
+
+	/**
+	 * gets the word list of words to find.
+	 * 
+	 * @param querie        the words to find
+	 * @param exact         Determines if it is exact/partial search
+	 * @return the set of words.
+	 */
+	public TreeSet<String> getWordsList(TreeSet<String> querie, boolean exact) {
+		if (exact)
+			return querie;
+		else
+			return getPartialWords(querie);
+	}
+
+	/**
+	 * Returns partial words for partial search.
+	 * 
+	 * @param querie        querie passed
+	 * @return the set of partial words.
+	 */
+	private TreeSet<String> getPartialWords(TreeSet<String> querie) {
+		TreeSet<String> foundWords = new TreeSet<String>();
+		for (String word : get()) {
+			for (String querieWord : querie) {
+				if (word.startsWith(querieWord)) {
+					foundWords.add(word);
+				}
+			}
+		}
+		return foundWords;
+	}
+
+	/**
+	 * Returns the list of paths of the words passed.
+	 * 
+	 * @param words         used to find their respective paths.
+	 * @return the set of paths
+	 */
+	public TreeSet<String> getPathList(TreeSet<String> words) {
+		TreeSet<String> foundpaths = new TreeSet<String>();
+		for (String word : words) {
+			foundpaths.addAll(get(word));
+		}
+		return foundpaths;
+	}
+	
 }
