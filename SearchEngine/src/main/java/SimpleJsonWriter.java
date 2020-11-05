@@ -139,11 +139,12 @@ public class SimpleJsonWriter {
 	/**
 	 * Writes the Querie search as a pretty JSON file
 	 * 
-	 * 
+	 * @param <SingleQuery> class
 	 * @param elements      the data structure that holds the querie results
 	 * @param writer        the writer used
 	 * @param level         the indent level
 	 * @throws IOException exception
+	 *
 	 */
 	public static <SingleQuery> void asQuerieStructure(
 			Map<String, ? extends Collection<InvertedIndex.SingleQuery>> elements, Writer writer, int level)

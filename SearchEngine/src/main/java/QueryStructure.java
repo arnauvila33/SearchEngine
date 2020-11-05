@@ -32,7 +32,6 @@ public class QueryStructure {
 	/**
 	 * Process Querie processes the querie with one thread.
 	 * 
-	 * @param querieStructure The querie structure to build to.
 	 * @param invertedIndex   invertedIndex to use to search.
 	 * @param path            path used to read querie
 	 * @param exact           boolean that determines exact/partial Search
