@@ -36,6 +36,7 @@ public class Driver {
 				System.out.println("Unable to build inverted index from path: " + argumentMap.getPath("-path"));
 			}
 		}
+		
 		if (argumentMap.hasFlag("-index")) {
 			Path path = argumentMap.getPath("-index", Paths.get("index.json"));
 			try {
@@ -44,6 +45,7 @@ public class Driver {
 				System.out.println("Unable to write to the json file at" + path);
 			}
 		}
+		
 		if (argumentMap.hasFlag("-queries")) {
 			try {
 				queryStructure.processQuerie(invertedIndex, argumentMap.getPath("-queries"),
@@ -52,6 +54,7 @@ public class Driver {
 				System.out.println("Unable to build querie from path" + argumentMap.getPath("-queries"));
 			}
 		}
+		
 		if (argumentMap.hasFlag("-results")) {
 			Path path = argumentMap.getPath("-results", Paths.get("results.json"));
 			try {
@@ -60,6 +63,7 @@ public class Driver {
 				System.out.println("Unable to write to the json file at" + path);
 			}
 		}
+		
 		if (argumentMap.hasFlag("-counts")) {
 			Path path = argumentMap.getPath("-counts", Paths.get("counts.json"));
 			try {
