@@ -21,12 +21,13 @@ public class QueryStructure {
 	 */
 	private final Map<String, ArrayList<InvertedIndex.SingleQuery>> queryStructure;
 
+	// TODO private final InvertedIndex invertedIndex;
+	
 	/**
 	 * Constructor for the QueryStructure
 	 */
-	public QueryStructure() {
+	public QueryStructure() { // TODO Pass in the invertedIndex to use here
 		queryStructure = new TreeMap<String, ArrayList<InvertedIndex.SingleQuery>>();
-
 	}
 
 	/**
@@ -37,13 +38,13 @@ public class QueryStructure {
 	 * @param exact           boolean that determines exact/partial Search
 	 * @throws IOException exception
 	 */
-
 	public void processQuerie(InvertedIndex invertedIndex, Path path, boolean exact) throws IOException {
 
 		BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);
 
 		String line = null;
 		while ((line = reader.readLine()) != null) {
+			// TODO processQuerie(line, exact);
 			TreeSet<String> list = new TreeSet<String>();
 			list = TextFileStemmer.uniqueStems(line);
 			String QuerieString = String.join(" ", list);
@@ -57,6 +58,18 @@ public class QueryStructure {
 		}
 
 	}
+	
+	/* TODO 
+	public void processQuerie(String line, boolean exact) {
+		TreeSet<String> stems = TextFileStemmer.uniqueStems(line);
+		String queryString = String.join(" ", stems);
+		
+		if (!stems.isEmpty()) {
+			ArrayList<InvertedIndex.SingleQuery> results = invertedIndex.search(stems, exact);
+			queryStructure.put(queryString, results);
+		}
+	}
+	*/
 
 	/**
 	 * Prints it to JSON

@@ -18,9 +18,6 @@ public class InvertedIndex {
 	/** map where count is stored */
 	private final TreeMap<String, Integer> countMap; 
 	
-	
-	
-
 	/**
 	 * Constructor for Inverted Index
 	 */
@@ -45,7 +42,7 @@ public class InvertedIndex {
 		countMap.putIfAbsent(location, 0);
 		if (result) {
 			countMap.replace(location, countMap.get(location) + 1);
-			// https://docs.oracle.com/en/java/javase/14/docs/api/java.base/java/util/Map.html#merge(K,V,java.util.function.BiFunction)
+			// TODO remove the putIfAbsent and use getOrDefault instead in the replace
 		}
 
 	}
@@ -196,8 +193,10 @@ public class InvertedIndex {
 	 * @author arnau
 	 *
 	 */
-	class SingleQuery implements Comparable<SingleQuery>{
+	class SingleQuery implements Comparable<SingleQuery> { // TODO SingleResult, use keywords
 
+		// TODO Properly encapsulate where appropriate
+		
 		/**
 		 * where
 		 */
@@ -240,6 +239,15 @@ public class InvertedIndex {
 				return where.compareToIgnoreCase(list.where.toLowerCase());
 			return 0;
 		}
+		
+		/*
+		 * TODO Create some get methods...
+		 * 
+		 * private void update(...) {
+		 *     set the count and the score
+		 *     this.score = (double) this.count / countMap.get(where); 
+		 * }
+		 */
 	}
 	
 	/**
@@ -268,6 +276,41 @@ public class InvertedIndex {
 		Collections.sort(querieResults);
 		return querieResults;
 	}
+	
+	/* TODO 
+	public List<SingleQuery> exactSearch(Set<String> queries) {
+		ArrayList<SingleQuery> querieResults = new ArrayList<SingleQuery>();
+		Map<String (location), Integer (number of matches/count) map = ...
+		
+		for each query in queries
+			if query is a key in the invertedIndex
+			 for each location for that query/key in the invertedIndex
+			 	((do stuff))
+		
+		loop through the map and create search results based on that data
+		
+		Collections.sort(querieResults);
+		return querieResults;
+	}
+
+	public List<SingleQuery> partialSearch(Set<String> queries) {
+		ArrayList<SingleQuery> querieResults = new ArrayList<SingleQuery>();
+		
+		for each query in queries
+			for each word in the invertedIndex
+				if the word starts with the query...
+				 for each location for that query/key in the invertedIndex
+				 	((do stuff))
+		
+		Collections.sort(querieResults);
+		return querieResults;		
+	}
+	*/
+	
+	/*
+	 * TODO If you have to make copies either we have the wrong data structure or
+	 * we are using the data structure we have incorrectly.
+	 */
 
 	/**
 	 * gets the word list of words to find.
