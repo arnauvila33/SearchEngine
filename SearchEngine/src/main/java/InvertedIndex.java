@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * A special type of simpleIndex that indexes the UNIQUE words that were found
@@ -16,15 +17,14 @@ public class InvertedIndex {
 	private final TreeMap<String, TreeMap<String, TreeSet<Integer>>> invertedIndex;
 
 	/** map where count is stored */
-	private final TreeMap<String, Integer> countMap; 
-	
+	private final TreeMap<String, Integer> countMap;
+
 	/**
 	 * Constructor for Inverted Index
 	 */
 	public InvertedIndex() {
 		invertedIndex = new TreeMap<String, TreeMap<String, TreeSet<Integer>>>();
 		countMap = new TreeMap<String, Integer>();
-
 	}
 
 	/**
@@ -42,9 +42,8 @@ public class InvertedIndex {
 		countMap.putIfAbsent(location, 0);
 		if (result) {
 			countMap.replace(location, countMap.get(location) + 1);
-			// TODO remove the putIfAbsent and use getOrDefault instead in the replace
+			countMap.getOrDefault(location, countMap.get(location) + 1);
 		}
-
 	}
 
 	/**
@@ -179,7 +178,7 @@ public class InvertedIndex {
 	 * @param path path to use to print
 	 * @throws IOException exception
 	 */
-	public void countToJson(Path path) throws IOException { 
+	public void countToJson(Path path) throws IOException {
 		SimpleJsonWriter.asObject(countMap, path);
 	}
 
@@ -187,28 +186,27 @@ public class InvertedIndex {
 	public String toString() {
 		return invertedIndex.toString();
 	}
-	
+
 	/**
 	 * SingleQuery class
+	 * 
 	 * @author arnau
 	 *
 	 */
-	class SingleQuery implements Comparable<SingleQuery> { // TODO SingleResult, use keywords
+	class SingleResult implements Comparable<SingleResult> {
 
-		// TODO Properly encapsulate where appropriate
-		
 		/**
 		 * where
 		 */
-		public String where;
+		private String where;
 		/**
 		 * count
 		 */
-		public int count;
+		private int count;
 		/**
 		 * score
 		 */
-		public double score;
+		private double score;
 
 		/**
 		 * Constructor method
@@ -217,20 +215,41 @@ public class InvertedIndex {
 		 * @param count the count of words
 		 * @param score the score
 		 */
-		public SingleQuery(String where, int count, double score) {
+		public SingleResult(String where, int count, double score) {
 			this.where = where;
 			this.count = count;
 			this.score = score;
 		}
 
 		/**
-		 * CompareTo method adapted to the class
+		 * Get method.
 		 * 
-		 * @param list the list to compare to
-		 * @return The int used to sort
+		 * @return where
 		 */
+		public String getWhere() {
+			return where;
+		}
+
+		/**
+		 * Get method.
+		 * 
+		 * @return count
+		 */
+		public int getCount() {
+			return count;
+		}
+
+		/**
+		 * Get method
+		 * 
+		 * @return score
+		 */
+		public double getScore() {
+			return score;
+		}
+
 		@Override
-		public int compareTo(SingleQuery list) {
+		public int compareTo(SingleResult list) {
 			if (Double.compare(score, list.score) != 0)
 				return Double.compare(list.score, score);
 			if (Integer.compare(count, list.count) != 0)
@@ -239,123 +258,83 @@ public class InvertedIndex {
 				return where.compareToIgnoreCase(list.where.toLowerCase());
 			return 0;
 		}
-		
-		/*
-		 * TODO Create some get methods...
-		 * 
-		 * private void update(...) {
-		 *     set the count and the score
-		 *     this.score = (double) this.count / countMap.get(where); 
-		 * }
-		 */
+
 	}
-	
+
 	/**
 	 * Search method used to build querie Structure
 	 * 
-	 * @param words         words passed to search
-	 * @param paths         paths passed to search in
+	 * @param words words passed to search
+	 * @param paths paths passed to search in
 	 * @return ArrayList with the queries found
 	 */
-	public ArrayList<SingleQuery> search(TreeSet<String> words, TreeSet<String> paths) {
-		ArrayList<SingleQuery> querieResults = new ArrayList<SingleQuery>();
+	public ArrayList<SingleResult> search(Set<String> words, boolean exact) {
+		if (exact)
+			return exactSearch(words);
+		else
+			return partialSearch(words);
+	}
 
-		Iterator<String> pathsIterator = paths.iterator();
-		while (pathsIterator.hasNext()) {
-			String where = pathsIterator.next();
-			int count = 0;
-			for (String word : words) {
-				if (get(word).contains(where)) {
-					count += size(word, where);
+	/**
+	 * Exact Search of the queries passed.
+	 * 
+	 * @param queries Set of words
+	 * @return an ArrayList of single results
+	 */
+	public ArrayList<SingleResult> exactSearch(Set<String> queries) {
+		ArrayList<SingleResult> querieResults = new ArrayList<SingleResult>();
+		Map<String, Integer> map = new TreeMap<String, Integer>();
+		for (String query : queries) {
+			if (contains(query)) {
+				Iterator<Map.Entry<String, TreeSet<Integer>>> iterator = invertedIndex.get(query).entrySet().iterator();
+				while (iterator.hasNext()) {
+					Entry<String, TreeSet<Integer>> entry = iterator.next();
+					map.putIfAbsent(entry.getKey(), 0);
+					int sum = map.get(entry.getKey()) + size(query, entry.getKey());
+					map.replace(entry.getKey(), sum);
 				}
 			}
-			double score = (double) count / (double) getCount(where);
-			SingleQuery querieTemp = new SingleQuery(where, count, score);
+		}
+		for (Entry<String, Integer> entry : map.entrySet()) {
+			double score = (double) entry.getValue() / (double) getCount(entry.getKey());
+			SingleResult querieTemp = new SingleResult(entry.getKey(), entry.getValue(), score);
 			querieResults.add(querieTemp);
 		}
 		Collections.sort(querieResults);
 		return querieResults;
 	}
-	
-	/* TODO 
-	public List<SingleQuery> exactSearch(Set<String> queries) {
-		ArrayList<SingleQuery> querieResults = new ArrayList<SingleQuery>();
-		Map<String (location), Integer (number of matches/count) map = ...
-		
-		for each query in queries
-			if query is a key in the invertedIndex
-			 for each location for that query/key in the invertedIndex
-			 	((do stuff))
-		
-		loop through the map and create search results based on that data
-		
-		Collections.sort(querieResults);
-		return querieResults;
-	}
-
-	public List<SingleQuery> partialSearch(Set<String> queries) {
-		ArrayList<SingleQuery> querieResults = new ArrayList<SingleQuery>();
-		
-		for each query in queries
-			for each word in the invertedIndex
-				if the word starts with the query...
-				 for each location for that query/key in the invertedIndex
-				 	((do stuff))
-		
-		Collections.sort(querieResults);
-		return querieResults;		
-	}
-	*/
-	
-	/*
-	 * TODO If you have to make copies either we have the wrong data structure or
-	 * we are using the data structure we have incorrectly.
-	 */
 
 	/**
-	 * gets the word list of words to find.
+	 * Partial search of the queries passed.
 	 * 
-	 * @param querie        the words to find
-	 * @param exact         Determines if it is exact/partial search
-	 * @return the set of words.
+	 * @param queries Set of words
+	 * @return an ArrayList of single results
 	 */
-	public TreeSet<String> getWordsList(TreeSet<String> querie, boolean exact) {
-		if (exact)
-			return querie;
-		else
-			return getPartialWords(querie);
-	}
-
-	/**
-	 * Returns partial words for partial search.
-	 * 
-	 * @param querie        querie passed
-	 * @return the set of partial words.
-	 */
-	private TreeSet<String> getPartialWords(TreeSet<String> querie) {
-		TreeSet<String> foundWords = new TreeSet<String>();
-		for (String word : get()) {
-			for (String querieWord : querie) {
-				if (word.startsWith(querieWord)) {
-					foundWords.add(word);
+	public ArrayList<SingleResult> partialSearch(Set<String> queries) {
+		ArrayList<SingleResult> queryResults = new ArrayList<SingleResult>();
+		Map<String, Integer> map = new TreeMap<String, Integer>();
+		for (String query : queries) {
+			for (String word : invertedIndex.keySet()) {
+				if (word.startsWith(query)) {
+					Iterator<Map.Entry<String, TreeSet<Integer>>> iterator = invertedIndex.get(word).entrySet()
+							.iterator();
+					while (iterator.hasNext()) {
+						Entry<String, TreeSet<Integer>> entry = iterator.next();
+						map.putIfAbsent(entry.getKey(), 0);
+						int sum = map.get(entry.getKey()) + size(word, entry.getKey());
+						map.replace(entry.getKey(), sum);
+					}
 				}
 			}
+
 		}
-		return foundWords;
+		for (Entry<String, Integer> entry : map.entrySet()) {
+			double score = (double) entry.getValue() / (double) getCount(entry.getKey());
+			SingleResult temp = new SingleResult(entry.getKey(), entry.getValue(), score);
+			queryResults.add(temp);
+		}
+		Collections.sort(queryResults);
+		return queryResults;
 	}
 
-	/**
-	 * Returns the list of paths of the words passed.
-	 * 
-	 * @param words         used to find their respective paths.
-	 * @return the set of paths
-	 */
-	public TreeSet<String> getPathList(TreeSet<String> words) {
-		TreeSet<String> foundpaths = new TreeSet<String>();
-		for (String word : words) {
-			foundpaths.addAll(get(word));
-		}
-		return foundpaths;
-	}
-	
 }

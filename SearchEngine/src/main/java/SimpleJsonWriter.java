@@ -147,13 +147,13 @@ public class SimpleJsonWriter {
 	 *
 	 */
 	public static <SingleQuery> void asQuerieStructure(
-			Map<String, ? extends Collection<InvertedIndex.SingleQuery>> elements, Writer writer, int level)
+			Map<String, ? extends Collection<InvertedIndex.SingleResult>> elements, Writer writer, int level)
 			throws IOException {
 		indent(writer, level);
 		writer.write("{");
 		writer.write("\n");
 		var iterator = elements.entrySet().iterator();
-		Entry<String, ? extends Collection<InvertedIndex.SingleQuery>> entry;
+		Entry<String, ? extends Collection<InvertedIndex.SingleResult>> entry;
 		if (iterator.hasNext()) {
 			entry = iterator.next();
 			indent(entry.getKey(), writer, level + 1);
@@ -180,11 +180,11 @@ public class SimpleJsonWriter {
 	 * @param level    the initial indent level
 	 * @throws IOException if an IO error occurs
 	 */
-	public static void asArrayQuerie(Collection<InvertedIndex.SingleQuery> elements, Writer writer, int level)
+	public static void asArrayQuerie(Collection<InvertedIndex.SingleResult> elements, Writer writer, int level)
 			throws IOException {
 
 		writer.write("[");
-		Iterator<InvertedIndex.SingleQuery> iterator = elements.iterator();
+		Iterator<InvertedIndex.SingleResult> iterator = elements.iterator();
 		if (iterator.hasNext()) {
 			asQuerie(iterator.next(), writer, level);
 		}
@@ -205,21 +205,21 @@ public class SimpleJsonWriter {
 	 * @param level  the indent level passed
 	 * @throws IOException exception
 	 */
-	public static void asQuerie(InvertedIndex.SingleQuery querie, Writer writer, int level) throws IOException {
+	public static void asQuerie(InvertedIndex.SingleResult querie, Writer writer, int level) throws IOException {
 		writer.write("\n");
 		indent(writer, level + 1);
 		writer.write("{\n");
 		indent("where", writer, level + 2);
 		writer.write(": ");
-		writer.write('"' + querie.where + '"');
+		writer.write('"' + querie.getWhere() + '"');
 		writer.write(",\n");
 		indent("count", writer, level + 2);
 		writer.write(": ");
-		writer.write(String.valueOf(querie.count));
+		writer.write(String.valueOf(querie.getCount()));
 		writer.write(",\n");
 		indent("score", writer, level + 2);
 		writer.write(": ");
-		writer.write(String.format("%.8f", querie.score));
+		writer.write(String.format("%.8f", querie.getScore()));
 		writer.write("\n");
 		indent(writer, level + 1);
 		writer.write("}");
@@ -406,7 +406,7 @@ public class SimpleJsonWriter {
 	 * @param elements map
 	 * @return string
 	 */
-	public static String asQuerieStructure(Map<String, ? extends Collection<InvertedIndex.SingleQuery>> elements) {
+	public static String asQuerieStructure(Map<String, ? extends Collection<InvertedIndex.SingleResult>> elements) {
 		// THIS CODE IS PROVIDED FOR YOU; DO NOT MODIFY
 		try {
 			StringWriter writer = new StringWriter();
@@ -424,7 +424,7 @@ public class SimpleJsonWriter {
 	 * @param path     used
 	 * @throws IOException exception
 	 */
-	public static void asQuerieStructure(Map<String, ? extends Collection<InvertedIndex.SingleQuery>> elements,
+	public static void asQuerieStructure(Map<String, ? extends Collection<InvertedIndex.SingleResult>> elements,
 			Path path) throws IOException {
 		// THIS CODE IS PROVIDED FOR YOU; DO NOT MODIFY
 		try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
