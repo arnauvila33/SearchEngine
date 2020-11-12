@@ -20,10 +20,14 @@ public class QueryStructure {
 	 * holds a list of queries.
 	 */
 	private final Map<String, ArrayList<InvertedIndex.SingleResult>> queryStructure;
+	/**
+	 * invertedIndex used to build queryStructure
+	 */
 	private final InvertedIndex invertedIndex;
 
 	/**
-	 * Constructor for the QueryStructure
+	 * Constructor
+	 * @param invertedIndex used
 	 */
 	public QueryStructure(InvertedIndex invertedIndex) {
 		queryStructure = new TreeMap<String, ArrayList<InvertedIndex.SingleResult>>();

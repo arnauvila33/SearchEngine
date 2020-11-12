@@ -265,7 +265,7 @@ public class InvertedIndex {
 	 * Search method used to build querie Structure
 	 * 
 	 * @param words words passed to search
-	 * @param paths paths passed to search in
+	 * @param exact boolean to check partial/exact
 	 * @return ArrayList with the queries found
 	 */
 	public ArrayList<SingleResult> search(Set<String> words, boolean exact) {
