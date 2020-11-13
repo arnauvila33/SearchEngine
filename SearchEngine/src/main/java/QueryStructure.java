@@ -63,6 +63,16 @@ public class QueryStructure {
 		String queryString = String.join(" ", stems);
 
 		if (!stems.isEmpty()) {
+			/*
+			 * TODO What happens if the lines "hello world" and "world hello" appear
+			 * in the same query file? Both will stem and sort to the same joined
+			 * "hello world" string. If you already found results "hello world" there
+			 * is no need to do it again, when your code encounters "world hello" in
+			 * the file. In other words...
+			 *
+			 * if the joined string is already in your results map, return (don't
+			 * search);
+			 */
 			ArrayList<InvertedIndex.SingleResult> results = invertedIndex.search(stems, exact);
 			queryStructure.put(queryString, results);
 		}

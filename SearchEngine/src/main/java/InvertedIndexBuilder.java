@@ -44,6 +44,7 @@ public class InvertedIndexBuilder {
 		try (BufferedReader reader = Files.newBufferedReader(inputPath, StandardCharsets.UTF_8);) {
 			String line = null;
 			Stemmer stemmer = new SnowballStemmer(SnowballStemmer.ALGORITHM.ENGLISH);
+			// TODO Store value of inputPath.toString as a variable here, and reuse that variable below. Do not call inputPath.toString() over and over again in the loop!
 			while ((line = reader.readLine()) != null) {
 				for (String word : TextParser.parse(line)) {
 					invertedIndex.add(stemmer.stem(word).toString(), inputPath.toString(), i++);
@@ -60,6 +61,7 @@ public class InvertedIndexBuilder {
 	 * @throws IOException exception
 	 */
 	public static void computeDirectory(InvertedIndex invertedIndex, Path inputPath) throws IOException {
+		// TODO Combine definition and declaration; don't create an arraylist you never use!
 		ArrayList<Path> pathList = new ArrayList<Path>();
 		pathList = traverseDirectory(inputPath, pathList);
 

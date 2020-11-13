@@ -146,7 +146,7 @@ public class SimpleJsonWriter {
 	 * @throws IOException exception
 	 *
 	 */
-	public static <SingleQuery> void asQuerieStructure(
+	public static <SingleQuery> void asQuerieStructure( // TODO asQueryStructure here and elsewhere, its "query" for singular and "queries" for plural (isn't English fun?)
 			Map<String, ? extends Collection<InvertedIndex.SingleResult>> elements, Writer writer, int level)
 			throws IOException {
 		indent(writer, level);
