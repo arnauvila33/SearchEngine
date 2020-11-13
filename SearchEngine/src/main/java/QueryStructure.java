@@ -27,6 +27,7 @@ public class QueryStructure {
 
 	/**
 	 * Constructor
+	 * 
 	 * @param invertedIndex used
 	 */
 	public QueryStructure(InvertedIndex invertedIndex) {
@@ -62,17 +63,7 @@ public class QueryStructure {
 		TreeSet<String> stems = TextFileStemmer.uniqueStems(line);
 		String queryString = String.join(" ", stems);
 
-		if (!stems.isEmpty()) {
-			/*
-			 * TODO What happens if the lines "hello world" and "world hello" appear
-			 * in the same query file? Both will stem and sort to the same joined
-			 * "hello world" string. If you already found results "hello world" there
-			 * is no need to do it again, when your code encounters "world hello" in
-			 * the file. In other words...
-			 *
-			 * if the joined string is already in your results map, return (don't
-			 * search);
-			 */
+		if (!stems.isEmpty() && !queryStructure.containsKey(queryString)) {
 			ArrayList<InvertedIndex.SingleResult> results = invertedIndex.search(stems, exact);
 			queryStructure.put(queryString, results);
 		}
@@ -85,7 +76,7 @@ public class QueryStructure {
 	 * @throws IOException exception
 	 */
 	public void toJson(Path path) throws IOException {
-		SimpleJsonWriter.asQuerieStructure(queryStructure, path);
+		SimpleJsonWriter.asQueryStructure(queryStructure, path);
 	}
 
 }

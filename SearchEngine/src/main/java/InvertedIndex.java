@@ -39,12 +39,9 @@ public class InvertedIndex {
 		invertedIndex.get(word).putIfAbsent(location, new TreeSet<>());
 		boolean result = invertedIndex.get(word).get(location).add(position);
 
-		// TODO Simplify below, no need to have both putIfAbsent and getOrDefault and replace
-		// TODO Can basically have 1-2 methods total inside the if, none outside
-		countMap.putIfAbsent(location, 0);
 		if (result) {
+			countMap.putIfAbsent(location, 0);
 			countMap.replace(location, countMap.get(location) + 1);
-			countMap.getOrDefault(location, countMap.get(location) + 1);
 		}
 	}
 
@@ -195,7 +192,7 @@ public class InvertedIndex {
 	 * @author arnau
 	 *
 	 */
-	class SingleResult implements Comparable<SingleResult> { // TODO public
+	public class SingleResult implements Comparable<SingleResult> {
 
 		/**
 		 * where
@@ -211,32 +208,25 @@ public class InvertedIndex {
 		private double score;
 
 		/**
-		 * Constructor method
+		 * Constructor method.
 		 * 
-		 * @param where the path
-		 * @param count the count of words
-		 * @param score the score
+		 * @param where path passed
 		 */
-		public SingleResult(String where, int count, double score) {
-			this.where = where;
-			this.count = count;
-			this.score = score;
-		}
-		
-		/* TODO Create 1 method that updates values for you. Then, don't require
-		 * those values in the constructor. So change to this:
 		public SingleResult(String where) {
 			this.where = where;
 			this.count = 0;
 			this.score = 0;
 		}
 
-		private void updateValues(String key) {
-		    this.count += ... access invertedIndex directly
-		    this.score = ... access countMap directly
-		}
+		/**
+		 * Method to update the score and count
+		 * 
+		 * @param key for invertedIndex.
 		 */
-
+		private void updateValues(String key) {
+			this.count += size(key, where);
+			this.score = (double) count / (double) InvertedIndex.this.getCount(where);
+		}
 
 		/**
 		 * Get method.
@@ -299,45 +289,26 @@ public class InvertedIndex {
 	 * @return an ArrayList of single results
 	 */
 	public ArrayList<SingleResult> exactSearch(Set<String> queries) {
-		ArrayList<SingleResult> querieResults = new ArrayList<SingleResult>(); // TODO Rename to queryResults or results
-		/*
-		 * TODO 
-		 * Choose a better, more efficient map implementation.
-		 * Don't store String (location) to Integer (count). Store the actual
-		 * SingleResult object instead, update the count stored by that object.
-		 * Allows you to eliminate the loop creating these objects below.
-		 * 
-		 * Map<String, Integer> map --> Map<String, SingleResult> map
-		 */
-		Map<String, Integer> map = new TreeMap<String, Integer>(); 
+		ArrayList<SingleResult> queryResults = new ArrayList<SingleResult>();
+		Map<String, SingleResult> map = new TreeMap<String, SingleResult>();
 		for (String query : queries) {
 			if (contains(query)) {
 				Iterator<Map.Entry<String, TreeSet<Integer>>> iterator = invertedIndex.get(query).entrySet().iterator();
 				while (iterator.hasNext()) {
 					Entry<String, TreeSet<Integer>> entry = iterator.next();
-					
-					/*
-					 * TODO Change this to check if you need to create a new result. If so
-					 * create one and add to both the map and the queryResults list.
-					 * 
-					 * Then call the new updateValues(...) method to set the count/score of
-					 * the stored result object.
-					 */
-					map.putIfAbsent(entry.getKey(), 0);
-					int sum = map.get(entry.getKey()) + size(query, entry.getKey());
-					map.replace(entry.getKey(), sum);
+					String path = entry.getKey();
+					if (!map.containsKey(path)) {
+						SingleResult temp = new SingleResult(path);
+						queryResults.add(temp);
+						map.put(path, temp);
+					}
+					map.get(path).updateValues(query);
+
 				}
 			}
 		}
-		
-		// TODO Remove this loop, integrate this work into the loop above
-		for (Entry<String, Integer> entry : map.entrySet()) {
-			double score = (double) entry.getValue() / (double) getCount(entry.getKey());
-			SingleResult querieTemp = new SingleResult(entry.getKey(), entry.getValue(), score);
-			querieResults.add(querieTemp);
-		}
-		Collections.sort(querieResults);
-		return querieResults;
+		Collections.sort(queryResults);
+		return queryResults;
 	}
 
 	/**
@@ -347,42 +318,28 @@ public class InvertedIndex {
 	 * @return an ArrayList of single results
 	 */
 	public ArrayList<SingleResult> partialSearch(Set<String> queries) {
-		// TODO See exactSearch comments
 		ArrayList<SingleResult> queryResults = new ArrayList<SingleResult>();
-		Map<String, Integer> map = new TreeMap<String, Integer>();
+		Map<String, SingleResult> map = new TreeMap<String, SingleResult>();
 		for (String query : queries) {
-			/*
-			 * TODO This is doing a linear search for a consecutive chunk of elements.
-			 * We fix these types of linear searches differently. Here, the key
-			 * observation to make is that our data is sorted. Anytime we have sorted
-			 * data, we can do something like a binary search to speed things up. In
-			 * this case, we don't need to explicitly do a binary search---this kind
-			 * of functionality is built into tree data structures. Look at this
-			 * lecture example:
-			 *
-			 * https://github.com/usf-cs212-fall2020/lectures/blob/87a9175b8b45b077e0845bee90d90a63ef5d8b3b/DataStructures/src/main/java/FindDemo.java#L145-L163
-			 *
-			 * You can take a similar approach using TreeMaps too! If you aren't sure
-			 * how to adapt this for partial search, reach out on Piazza!
-			 */
-			for (String word : invertedIndex.keySet()) {
-				if (word.startsWith(query)) {
+			for (String word : invertedIndex.tailMap(query).keySet()) {
+				if (!word.startsWith(query)) {
+					break;
+				} else {
 					Iterator<Map.Entry<String, TreeSet<Integer>>> iterator = invertedIndex.get(word).entrySet()
 							.iterator();
 					while (iterator.hasNext()) {
 						Entry<String, TreeSet<Integer>> entry = iterator.next();
-						map.putIfAbsent(entry.getKey(), 0);
-						int sum = map.get(entry.getKey()) + size(word, entry.getKey());
-						map.replace(entry.getKey(), sum);
+						String path = entry.getKey();
+						if (!map.containsKey(path)) {
+							SingleResult temp = new SingleResult(path);
+							queryResults.add(temp);
+							map.put(path, temp);
+						}
+						map.get(path).updateValues(word);
 					}
 				}
 			}
 
-		}
-		for (Entry<String, Integer> entry : map.entrySet()) {
-			double score = (double) entry.getValue() / (double) getCount(entry.getKey());
-			SingleResult temp = new SingleResult(entry.getKey(), entry.getValue(), score);
-			queryResults.add(temp);
 		}
 		Collections.sort(queryResults);
 		return queryResults;

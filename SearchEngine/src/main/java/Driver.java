@@ -47,11 +47,11 @@ public class Driver {
 		}
 
 		if (argumentMap.hasFlag("-queries")) {
-			// TODO Path path = ... and reuse in the try & catch below
+			Path path=argumentMap.getPath("-queries");
 			try {
-				queryStructure.processQuery(argumentMap.getPath("-queries"), argumentMap.hasFlag("-exact"));
+				queryStructure.processQuery(path, argumentMap.hasFlag("-exact"));
 			} catch (Exception e) {
-				System.out.println("Unable to build querie from path" + argumentMap.getPath("-queries"));
+				System.out.println("Unable to build querie from path" + path);
 			}
 		}
 
