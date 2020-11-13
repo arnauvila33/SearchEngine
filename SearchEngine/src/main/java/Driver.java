@@ -47,6 +47,7 @@ public class Driver {
 		}
 
 		if (argumentMap.hasFlag("-queries")) {
+			// TODO Path path = ... and reuse in the try & catch below
 			try {
 				queryStructure.processQuery(argumentMap.getPath("-queries"), argumentMap.hasFlag("-exact"));
 			} catch (Exception e) {
