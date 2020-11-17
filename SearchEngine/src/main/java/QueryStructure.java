@@ -42,14 +42,16 @@ public class QueryStructure {
 	 * @param exact boolean that determines exact/partial Search
 	 * @throws IOException exception
 	 */
-	public void processQuery(Path path, boolean exact) throws IOException {
+	public void processQuery(Path path, boolean exact) {
 
-		// TODO Use try-with-resources
-		BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);
-
-		String line = null;
-		while ((line = reader.readLine()) != null) {
-			processResult(line, exact);
+		try {
+			BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);
+			String line = null;
+			while ((line = reader.readLine()) != null) {
+				processResult(line, exact);
+			}
+		} catch (IOException e) {
+			return;
 		}
 
 	}

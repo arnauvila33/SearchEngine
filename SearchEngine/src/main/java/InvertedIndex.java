@@ -40,9 +40,7 @@ public class InvertedIndex {
 		boolean result = invertedIndex.get(word).get(location).add(position);
 
 		if (result) {
-			// TODO Try countMap.put(location, countMap.getOrDefault(location, 0) + 1);
-			countMap.putIfAbsent(location, 0);
-			countMap.replace(location, countMap.get(location) + 1);
+			countMap.put(location, countMap.getOrDefault(location, 0) + 1);
 		}
 	}
 
@@ -198,7 +196,7 @@ public class InvertedIndex {
 		/**
 		 * where
 		 */
-		private String where; // TODO final
+		private final String where;
 		/**
 		 * count
 		 */
@@ -291,29 +289,35 @@ public class InvertedIndex {
 	 */
 	public ArrayList<SingleResult> exactSearch(Set<String> queries) {
 		ArrayList<SingleResult> queryResults = new ArrayList<SingleResult>();
-		Map<String, SingleResult> map = new TreeMap<String, SingleResult>(); 
-		// TODO I already commented on the use of TreeMap above: https://github.com/usf-cs212-fall2020/project-arnauvila33/blob/6f62ad6e6baf99775f5cb6b2dcda7efa83a68902/SearchEngine/src/main/java/InvertedIndex.java#L305
-		// TODO Choose a better map implementation
+		Map<String, SingleResult> map = new HashMap<String, SingleResult>(); 
 		for (String query : queries) {
 			if (contains(query)) {
-				// TODO Move the duplicate code into a private helper method and call in both search methods
-				Iterator<Map.Entry<String, TreeSet<Integer>>> iterator = invertedIndex.get(query).entrySet().iterator();
-				while (iterator.hasNext()) {
-					Entry<String, TreeSet<Integer>> entry = iterator.next();
-					String path = entry.getKey();
-					if (!map.containsKey(path)) {
-						SingleResult temp = new SingleResult(path);
-						queryResults.add(temp);
-						map.put(path, temp);
-					}
-					map.get(path).updateValues(query);
-				}
+				makeSingleResult(map, queryResults, query);
 			}
 		}
 		Collections.sort(queryResults);
 		return queryResults;
 	}
-
+	
+	/**
+	 * Method that makes the queryResults list
+	 * @param map map used
+	 * @param queryResults the list to be made
+	 * @param word the query searched for
+	 */
+	public void makeSingleResult(Map<String, SingleResult> map, List<SingleResult> queryResults, String word) {
+		Iterator<Map.Entry<String, TreeSet<Integer>>> iterator = invertedIndex.get(word).entrySet().iterator();
+		while (iterator.hasNext()) {
+			Entry<String, TreeSet<Integer>> entry = iterator.next();
+			String path = entry.getKey();
+			if (!map.containsKey(path)) {
+				SingleResult temp = new SingleResult(path);
+				queryResults.add(temp);
+				map.put(path, temp);
+			}
+			map.get(path).updateValues(word);
+		}
+	}
 	/**
 	 * Partial search of the queries passed.
 	 * 
@@ -322,24 +326,13 @@ public class InvertedIndex {
 	 */
 	public ArrayList<SingleResult> partialSearch(Set<String> queries) {
 		ArrayList<SingleResult> queryResults = new ArrayList<SingleResult>();
-		Map<String, SingleResult> map = new TreeMap<String, SingleResult>();
+		Map<String, SingleResult> map = new HashMap<String, SingleResult>();
 		for (String query : queries) {
 			for (String word : invertedIndex.tailMap(query).keySet()) {
 				if (!word.startsWith(query)) {
 					break;
 				} else {
-					Iterator<Map.Entry<String, TreeSet<Integer>>> iterator = invertedIndex.get(word).entrySet()
-							.iterator();
-					while (iterator.hasNext()) {
-						Entry<String, TreeSet<Integer>> entry = iterator.next();
-						String path = entry.getKey();
-						if (!map.containsKey(path)) {
-							SingleResult temp = new SingleResult(path);
-							queryResults.add(temp);
-							map.put(path, temp);
-						}
-						map.get(path).updateValues(word);
-					}
+					makeSingleResult(map, queryResults, word);
 				}
 			}
 

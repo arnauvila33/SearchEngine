@@ -1,5 +1,4 @@
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
 
@@ -11,7 +10,6 @@ import java.time.Instant;
  */
 public class Driver {
 
-	// TODO Change all calls to Paths.get to Path.of instead
 	
 	/**
 	 * Initializes the classes necessary based on the provided command-line
@@ -40,7 +38,7 @@ public class Driver {
 		}
 
 		if (argumentMap.hasFlag("-index")) {
-			Path path = argumentMap.getPath("-index", Paths.get("index.json"));
+			Path path = argumentMap.getPath("-index", Path.of("index.json"));
 			try {
 				invertedIndex.toJson(path);
 			} catch (Exception e) {
@@ -58,7 +56,7 @@ public class Driver {
 		}
 
 		if (argumentMap.hasFlag("-results")) {
-			Path path = argumentMap.getPath("-results", Paths.get("results.json"));
+			Path path = argumentMap.getPath("-results", Path.of("results.json"));
 			try {
 				queryStructure.toJson(path);
 			} catch (Exception e) {
@@ -67,7 +65,7 @@ public class Driver {
 		}
 
 		if (argumentMap.hasFlag("-counts")) {
-			Path path = argumentMap.getPath("-counts", Paths.get("counts.json"));
+			Path path = argumentMap.getPath("-counts", Path.of("counts.json"));
 			try {
 				invertedIndex.countToJson(path);
 			} catch (Exception e) {
