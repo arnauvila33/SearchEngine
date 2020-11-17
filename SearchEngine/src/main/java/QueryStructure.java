@@ -44,6 +44,7 @@ public class QueryStructure {
 	 */
 	public void processQuery(Path path, boolean exact) throws IOException {
 
+		// TODO Use try-with-resources
 		BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);
 
 		String line = null;
