@@ -11,6 +11,8 @@ import java.time.Instant;
  */
 public class Driver {
 
+	// TODO Change all calls to Paths.get to Path.of instead
+	
 	/**
 	 * Initializes the classes necessary based on the provided command-line
 	 * arguments. This includes (but is not limited to) how to build or search an
