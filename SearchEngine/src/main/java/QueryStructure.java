@@ -39,7 +39,7 @@ public class QueryStructure {
 	 * Process Querie processes the querie with one thread.
 	 * 
 	 * @param path  path used to read querie
-	 * @param exact boolean that determines exact/partial Search
+	 * @param exact boolean that determines exact/partial Search 
 	 */
 	public void processQuery(Path path, boolean exact) {
 
