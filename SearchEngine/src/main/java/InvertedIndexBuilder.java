@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import opennlp.tools.stemmer.Stemmer;
 import opennlp.tools.stemmer.snowball.SnowballStemmer;
 
+// TODO Either extend your classes from previous projects or create completely new classes to support multithreading.
+
 /**
  * Inverted Index Builder class builds an inverted index data structure.
  * 
@@ -113,6 +115,7 @@ public class InvertedIndexBuilder {
 			}
 			queue.join();
 		} catch (IOException exception) {
+			// TODO Never do this, always do something with the exception
 			return;
 		}
 

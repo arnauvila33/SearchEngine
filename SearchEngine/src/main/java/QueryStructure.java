@@ -91,6 +91,7 @@ public class QueryStructure {
 	public void processQueryMultithreading(Path path, boolean exact, int threads)  {
 		
 		try {
+			// TODO Try-with-resources
 			BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);
 			String line = null;
 			WorkQueue queue = new WorkQueue(threads);
@@ -146,7 +147,7 @@ public class QueryStructure {
 
 		@Override
 		public void run() {
-			synchronized (queryStructure) {
+			synchronized (queryStructure) { // TODO Over-synchronization (stems and the join don't need to be synchronized)
 				TreeSet<String> stems = TextFileStemmer.uniqueStems(line);
 				String queryString = String.join(" ", stems);
 
