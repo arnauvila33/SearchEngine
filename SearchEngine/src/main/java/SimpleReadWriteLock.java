@@ -130,7 +130,7 @@ public class SimpleReadWriteLock {
 
 				assert writers == 0;
 				readers++;
-				lock.notifyAll();
+				lock.notifyAll(); // TODO Over-notification, remove
 			}
 		}
 
@@ -145,7 +145,7 @@ public class SimpleReadWriteLock {
 			synchronized (lock) {
 				if (readers != 0) {
 					readers--;
-					lock.notifyAll();
+					lock.notifyAll(); // TODO Over-notification, only call when readers is 0
 				} else {
 					throw new IllegalStateException();
 				}
@@ -162,7 +162,7 @@ public class SimpleReadWriteLock {
 		/**
 		 * Keeps track of current5 writing thread.
 		 */
-		private Thread curr=null;
+		private Thread curr = null;
 
 		/**
 		 * Waits until there are no active readers or writers in the system. Then,
@@ -179,10 +179,10 @@ public class SimpleReadWriteLock {
 						Thread.currentThread().interrupt();
 					}
 				}
-				if (writers == 0) {
+				if (writers == 0) { // TODO Remove, if need there is a bug
 					writers++;
 					curr = Thread.currentThread();
-					lock.notifyAll();
+					lock.notifyAll();  // TODO Over-notification, remove
 				}
 			}
 		}
@@ -218,7 +218,7 @@ public class SimpleReadWriteLock {
 	 *
 	 * @param args unused
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) { // TODO Remove
 		// try double read unlock
 		try {
 			SimpleReadWriteLock lock = new SimpleReadWriteLock();

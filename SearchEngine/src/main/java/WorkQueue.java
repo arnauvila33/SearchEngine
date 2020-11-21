@@ -100,7 +100,7 @@ public class WorkQueue {
 					Thread.currentThread().interrupt();
 				}
 			}
-			queue.notifyAll();
+			queue.notifyAll(); // TODO Remove
 		}
 
 		// throw new UnsupportedOperationException("Not yet implemented.");
@@ -188,11 +188,17 @@ public class WorkQueue {
 					decrementPending();
 				} catch (RuntimeException ex) {
 					// catch runtime exceptions to avoid leaking threads
-					ex.printStackTrace();
+					ex.printStackTrace(); // TODO Remove
 					System.err.println("Warning: Work queue encountered an exception while running.");
 				}
+				// TODO finally { decrementPending(); }
 			}
 		}
 	}
+	
+	/*
+	 * TODO ONLY synchronize on the "this" keyword for code that
+	 * accesses the pending variable.
+	 */
 
 }
