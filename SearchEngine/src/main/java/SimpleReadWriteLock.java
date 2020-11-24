@@ -130,7 +130,6 @@ public class SimpleReadWriteLock {
 
 				assert writers == 0;
 				readers++;
-				lock.notifyAll(); // TODO Over-notification, remove
 			}
 		}
 
@@ -145,8 +144,13 @@ public class SimpleReadWriteLock {
 			synchronized (lock) {
 				if (readers != 0) {
 					readers--;
+					
+				} 
+				else if(readers==0){
 					lock.notifyAll(); // TODO Over-notification, only call when readers is 0
-				} else {
+				}
+					else {
+				
 					throw new IllegalStateException();
 				}
 			}
@@ -178,12 +182,12 @@ public class SimpleReadWriteLock {
 					} catch (InterruptedException ex) {
 						Thread.currentThread().interrupt();
 					}
-				}
-				if (writers == 0) { // TODO Remove, if need there is a bug
+				}if (writers == 0) {
 					writers++;
 					curr = Thread.currentThread();
-					lock.notifyAll();  // TODO Over-notification, remove
+					lock.notifyAll();
 				}
+				
 			}
 		}
 
@@ -213,51 +217,4 @@ public class SimpleReadWriteLock {
 		}
 	}
 
-	/**
-	 * Demonstrates invalid lock/unlock combinations.
-	 *
-	 * @param args unused
-	 */
-	public static void main(String[] args) { // TODO Remove
-		// try double read unlock
-		try {
-			SimpleReadWriteLock lock = new SimpleReadWriteLock();
-			lock.readLock().lock();
-			lock.readLock().unlock();
-			lock.readLock().unlock();
-		} catch (Exception e) {
-			// should be IllegalStateException
-			e.printStackTrace();
-		}
-
-		System.out.println();
-
-		// try double write unlock
-		try {
-			SimpleReadWriteLock lock = new SimpleReadWriteLock();
-			lock.writeLock().lock();
-			lock.writeLock().unlock();
-			lock.writeLock().unlock();
-		} catch (Exception e) {
-			// should be IllegalStateException
-			e.printStackTrace();
-		}
-
-		System.out.println();
-
-		// try wrong thread unlock
-		try {
-			SimpleReadWriteLock lock = new SimpleReadWriteLock();
-			lock.writeLock().lock();
-
-			Thread thread = new Thread(() -> {
-				lock.writeLock().unlock();
-			});
-			thread.start();
-			thread.join();
-		} catch (Exception e) {
-			// should be ConcurrentModificationException
-			e.printStackTrace();
-		}
-	}
 }

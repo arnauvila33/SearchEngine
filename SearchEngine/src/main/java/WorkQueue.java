@@ -66,8 +66,10 @@ public class WorkQueue {
 	 * @param r work request (in the form of a {@link Runnable} object)
 	 */
 	public void execute(Runnable r) {
-		synchronized (queue) {
+		synchronized(this) {
 			incrementPending();
+		}
+		synchronized (queue) {		
 			queue.addLast(r);
 			queue.notifyAll();
 		}
@@ -100,10 +102,8 @@ public class WorkQueue {
 					Thread.currentThread().interrupt();
 				}
 			}
-			queue.notifyAll(); // TODO Remove
+			
 		}
-
-		// throw new UnsupportedOperationException("Not yet implemented.");
 	}
 
 	/**
@@ -185,13 +185,15 @@ public class WorkQueue {
 
 				try {
 					r.run();
-					decrementPending();
 				} catch (RuntimeException ex) {
-					// catch runtime exceptions to avoid leaking threads
-					ex.printStackTrace(); // TODO Remove
 					System.err.println("Warning: Work queue encountered an exception while running.");
+					ex.printStackTrace();
 				}
-				// TODO finally { decrementPending(); }
+				finally {
+					synchronized(this) {
+						decrementPending();
+					}
+				}
 			}
 		}
 	}

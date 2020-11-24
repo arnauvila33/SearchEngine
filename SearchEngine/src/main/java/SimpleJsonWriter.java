@@ -215,7 +215,7 @@ public class SimpleJsonWriter {
 		writer.write(",\n");
 		indent("count", writer, level + 2);
 		writer.write(": ");
-		writer.write(String.valueOf(querie.getCount()));
+		writer.write(String.valueOf(querie.getCountt()));
 		writer.write(",\n");
 		indent("score", writer, level + 2);
 		writer.write(": ");

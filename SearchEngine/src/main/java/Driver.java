@@ -24,20 +24,22 @@ public class Driver {
 		// stores the args as flags
 		ArgumentMap argumentMap = new ArgumentMap(args);
 		// InvertedIndex object
-		InvertedIndex invertedIndex = new InvertedIndex();
+		InvertedIndex invertedIndex = null;
 		// QuerieStructure object
-		QueryStructure queryStructure = new QueryStructure(invertedIndex);
-
+		QueryStructure queryStructure = null;
+ 
 		if (argumentMap.hasFlag("-path")) {
 			Path path = argumentMap.getPath("-path");
 			if (argumentMap.hasFlag("-threads")) {
+				invertedIndex=new ThreadSafeInvertedIndex();
 				try {
-					InvertedIndexBuilder.fillInvertedIndexMultithread(invertedIndex, path,
+					MultithreadInvertedIndexBuilder.fillInvertedIndexMultithread((ThreadSafeInvertedIndex) invertedIndex, path,
 							argumentMap.getInteger("-threads", 5));
 				} catch (Exception e) {
 					System.out.println("Unable to build inverted index from path: " + path);
 				}
 			} else {
+				invertedIndex=new InvertedIndex();
 				try {
 					InvertedIndexBuilder.fillInvertedIndex(invertedIndex, path);
 				} catch (Exception e) {
@@ -45,24 +47,27 @@ public class Driver {
 				}
 			}
 		}
+		else invertedIndex=new InvertedIndex();
 
 		if (argumentMap.hasFlag("-queries")) {
 			Path path = argumentMap.getPath("-queries");
 			if (argumentMap.hasFlag("-threads")) {
+				queryStructure=new MultithreadQueryStructure((ThreadSafeInvertedIndex)invertedIndex);
 				try {
-					queryStructure.processQueryMultithreading(path, argumentMap.hasFlag("-exact"),
+					((MultithreadQueryStructure) queryStructure).processQueryMultithreading(path, argumentMap.hasFlag("-exact"),
 							argumentMap.getInteger("-threads", 5));
 				} catch (Exception e) {
 					System.out.println("Unable to build inverted index from path: " + argumentMap.getPath("-path"));
 				}
 			} else {
+				queryStructure=new QueryStructure(invertedIndex);
 				try {
 					queryStructure.processQuery(path, argumentMap.hasFlag("-exact"));
 				} catch (Exception e) {
 					System.out.println("Unable to build querie from path" + path);
 				}
 			}
-		}
+		} else queryStructure=new QueryStructure(invertedIndex);
 		if (argumentMap.hasFlag("-index")) {
 			Path path = argumentMap.getPath("-index", Path.of("index.json"));
 			try {

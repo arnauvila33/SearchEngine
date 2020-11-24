@@ -127,6 +127,7 @@ public class InvertedIndex {
 	 * @return Integer
 	 */
 	public Integer getCount(String word) {
+		System.out.println("Word "+word);
 		return countMap.get(word);
 	}
 
@@ -148,6 +149,7 @@ public class InvertedIndex {
 	 *         number of words stored for that element
 	 */
 	public int size(String word) {
+		
 		return get(word).size();
 	}
 
@@ -225,8 +227,11 @@ public class InvertedIndex {
 		 * @param key for invertedIndex.
 		 */
 		private void updateValues(String key) {
+			System.out.println("updating values!!!!!!!!!");
 			this.count += size(key, where);
-			this.score = (double) count / (double) InvertedIndex.this.getCount(where);
+			System.out.println("updating values2!!");
+			this.score = (double) count / (double) getCount(where);
+			System.out.println("VALUES UPDATED!");
 		}
 
 		/**
@@ -243,7 +248,7 @@ public class InvertedIndex {
 		 * 
 		 * @return count
 		 */
-		public int getCount() {
+		public int getCountt() {
 			return count;
 		}
 
@@ -277,6 +282,7 @@ public class InvertedIndex {
 	 * @return ArrayList with the queries found
 	 */
 	public ArrayList<SingleResult> search(Set<String> words, boolean exact) {
+		System.out.println("Not Safe Search  0.");
 		if (exact)
 			return exactSearch(words);
 		else
@@ -290,11 +296,15 @@ public class InvertedIndex {
 	 * @return an ArrayList of single results
 	 */
 	public ArrayList<SingleResult> exactSearch(Set<String> queries) {
+		System.out.println("Not safe search. 1");
 		ArrayList<SingleResult> queryResults = new ArrayList<SingleResult>();
 		Map<String, SingleResult> map = new HashMap<String, SingleResult>(); 
 		for (String query : queries) {
+			System.out.println("Not safe search. 2");
 			if (contains(query)) {
+				System.out.println("Not safe search. 3");
 				makeSingleResult(map, queryResults, query);
+				System.out.println("Not safe search. 4");
 			}
 		}
 		Collections.sort(queryResults);
@@ -308,6 +318,7 @@ public class InvertedIndex {
 	 * @param word the query searched for
 	 */
 	public void makeSingleResult(Map<String, SingleResult> map, List<SingleResult> queryResults, String word) {
+		System.out.println("Not safe search. make Results");
 		Iterator<Map.Entry<String, TreeSet<Integer>>> iterator = invertedIndex.get(word).entrySet().iterator();
 		while (iterator.hasNext()) {
 			Entry<String, TreeSet<Integer>> entry = iterator.next();
@@ -317,7 +328,9 @@ public class InvertedIndex {
 				queryResults.add(temp);
 				map.put(path, temp);
 			}
+			System.out.println("about to update values");
 			map.get(path).updateValues(word);
+			System.out.println("updating values1");
 		}
 	}
 	/**
