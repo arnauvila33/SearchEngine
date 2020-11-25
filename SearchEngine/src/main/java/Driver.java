@@ -27,8 +27,13 @@ public class Driver {
 		InvertedIndex invertedIndex = null;
 		// QuerieStructure object
 		QueryStructure queryStructure = null;
+		
+		if(argumentMap.hasFlag("-url")) {
+			invertedIndex=new ThreadSafeInvertedIndex();
+			WebCrawler webCrawler=new WebCrawler(invertedIndex, argumentMap.getString("-url"),argumentMap.getInteger("-max", 1));
+		}
  
-		if (argumentMap.hasFlag("-path")) {
+		else if (argumentMap.hasFlag("-path")) {
 			Path path = argumentMap.getPath("-path");
 			if (argumentMap.hasFlag("-threads")) {
 				invertedIndex=new ThreadSafeInvertedIndex();
