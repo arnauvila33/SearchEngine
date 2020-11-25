@@ -144,13 +144,11 @@ public class SimpleReadWriteLock {
 			synchronized (lock) {
 				if (readers != 0) {
 					readers--;
-					
-				} 
-				else if(readers==0){
-					lock.notifyAll(); // TODO Over-notification, only call when readers is 0
-				}
-					else {
-				
+
+				} else if (readers == 0) {
+					lock.notifyAll();
+				} else {
+
 					throw new IllegalStateException();
 				}
 			}
@@ -162,7 +160,7 @@ public class SimpleReadWriteLock {
 	 * Used to maintain exclusive write operations.
 	 */
 	private class WriteLock implements SimpleLock {
-		
+
 		/**
 		 * Keeps track of current5 writing thread.
 		 */
@@ -182,12 +180,13 @@ public class SimpleReadWriteLock {
 					} catch (InterruptedException ex) {
 						Thread.currentThread().interrupt();
 					}
-				}if (writers == 0) {
+				}
+				if (writers == 0) {
 					writers++;
 					curr = Thread.currentThread();
 					lock.notifyAll();
 				}
-				
+
 			}
 		}
 

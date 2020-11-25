@@ -112,7 +112,6 @@ public class ThreadSafeInvertedIndex extends InvertedIndex{
 	
 	@Override
 	public Integer getCount(String word) {
-		System.out.println("ThreadSafe count");
 		lock.readLock().lock();
 		try {
 			return super.getCount(word);
@@ -145,7 +144,6 @@ public class ThreadSafeInvertedIndex extends InvertedIndex{
 	}
 	@Override
 	public int size(String word, String path) {
-		System.out.println("ThreadSafe size");
 		lock.readLock().lock();
 
 		try {
@@ -155,7 +153,7 @@ public class ThreadSafeInvertedIndex extends InvertedIndex{
 			lock.readLock().unlock();
 		}
 	}
-	
+	@Override
 	public void toJson(Path path) throws IOException {
 		lock.readLock().lock();
 
@@ -166,6 +164,7 @@ public class ThreadSafeInvertedIndex extends InvertedIndex{
 			lock.readLock().unlock();
 		}
 	}
+	@Override
 	public void countToJson(Path path) throws IOException {
 		lock.readLock().lock();
 

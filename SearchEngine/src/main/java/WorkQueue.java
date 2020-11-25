@@ -66,9 +66,9 @@ public class WorkQueue {
 	 * @param r work request (in the form of a {@link Runnable} object)
 	 */
 	public void execute(Runnable r) {
-		synchronized(this) {
-			incrementPending();
-		}
+		
+		incrementPending();
+		
 		synchronized (queue) {		
 			queue.addLast(r);
 			queue.notifyAll();
@@ -190,9 +190,9 @@ public class WorkQueue {
 					ex.printStackTrace();
 				}
 				finally {
-					synchronized(this) {
+					
 						decrementPending();
-					}
+					
 				}
 			}
 		}
