@@ -44,40 +44,27 @@ public class LinkParser {
 	 * @return list of all valid http(s) links in the order they were found
 	 */
 	public static ArrayList<URL> getValidLinks(URL base, String html) {
-		/*
-		 * TODO A starter template is given below, but you do not have to use it.
-		 */
 
 		ArrayList<URL> list = new ArrayList<URL>();
 
-		
 		String regexTag = "(?i)<a\\s*(?:[^>]*?\\s*)?href\\s*=\\s*\"([^\"]*)\"";
-		
+
 		Pattern patternTag = Pattern.compile(regexTag);
-		//Pattern pattern = Pattern.compile("\\s*(?i)href\\s*=\\s*(\"([^\"]*)|'[^']*'|([^'\">\\s]+))");
-	
-		
+
 		Matcher tagMatcher = patternTag.matcher(html);
 
-		
 		while (tagMatcher.find()) {
-	
-				try {
-					URL absolute = new URL(base, tagMatcher.group(1));
-					//System.out.println("NormalizedURL: " + normalize(absolute));
-					list.add(normalize(absolute));
-				} catch (MalformedURLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (URISyntaxException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-		
+
+			try {
+				URL absolute = new URL(base, tagMatcher.group(1));
+				list.add(normalize(absolute));
+			} catch (MalformedURLException | URISyntaxException e) {
+				e.printStackTrace();
+			}
+
 		}
 
 		return list;
 
 	}
 }
-

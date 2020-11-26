@@ -93,7 +93,6 @@ public class HtmlFetcher {
 	 * @see #isRedirect(Map)
 	 */
 	public static String fetch(URL url, int redirects) throws IOException {
-		// TODO Fill in this method.
 		try (
 			Socket socket = HttpsFetcher.openConnection(url);
 			PrintWriter request = new PrintWriter(socket.getOutputStream());

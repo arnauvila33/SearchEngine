@@ -3,7 +3,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.Map.Entry;
 
-// TODO Create a thread-safe inverted index using the custom read/write lock class above.
+
 
 /**
  * A special type of simpleIndex that indexes the UNIQUE words that were found

@@ -89,7 +89,7 @@ public class HtmlCleaner {
 	 * @see Matcher#replaceAll(java.util.function.Function)
 	 */
 	public static String stripComments(String html) {
-		Pattern patternTag = Pattern.compile("(?is)<!--([\\s\\S]*?)-->");
+		Pattern patternTag = Pattern.compile("(?is)<!--[\\s\\S]*?-->");
 		if(patternTag.matcher(html)==null)
 			return "";
 		Matcher tagMatcher = patternTag.matcher(html);
@@ -132,7 +132,7 @@ public class HtmlCleaner {
 		//Matcher tagMatcher = patternTag.matcher(html);
 		StringBuilder sb=new StringBuilder();
 
-		Pattern patternTag = Pattern.compile("(?is)<"+name+"[\\S\\s]*?>[\\S\\s]*?<\\/"+name+"[\\S\\s]*?>");
+		Pattern patternTag = Pattern.compile("(?is)<\\b"+name+"\\b[\\S\\s]*?>[\\S\\s]*?<\\/"+name+"[\\S\\s]*?>");
 		Matcher tagMatcher = patternTag.matcher(html);
 		while(tagMatcher.find()) {
 			if(tagMatcher.group().contains("\n")) {
