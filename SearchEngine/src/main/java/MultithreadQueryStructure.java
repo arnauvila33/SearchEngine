@@ -9,7 +9,11 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 
-
+/**
+ * Multithreading Query Structure class
+ * @author arnau
+ *
+ */
 public class MultithreadQueryStructure extends QueryStructure{
 	
 	/**
@@ -21,6 +25,10 @@ public class MultithreadQueryStructure extends QueryStructure{
 	 */
 	private final ThreadSafeInvertedIndex invertedIndex;
 	
+	/**
+	 * Constructor
+	 * @param invertedIndex to use
+	 */
 	public MultithreadQueryStructure(ThreadSafeInvertedIndex invertedIndex) {
 		super(invertedIndex);
 		this.invertedIndex=invertedIndex;
@@ -97,10 +105,8 @@ public class MultithreadQueryStructure extends QueryStructure{
 			String queryString = String.join(" ", stems);
 			if (!stems.isEmpty() && !queryStructure.containsKey(queryString)) {
 				ArrayList<InvertedIndex.SingleResult> results = invertedIndex.search(stems, exact);
-				System.out.println("Found");
 				synchronized (queryStructure) { 
 					queryStructure.put(queryString, results);
-					System.out.println("Added");
 				}
 			}
 

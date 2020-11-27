@@ -9,7 +9,11 @@ import opennlp.tools.stemmer.Stemmer;
 import opennlp.tools.stemmer.snowball.SnowballStemmer;
 
 
-
+/**
+ * Multithreading inverted index builder class
+ * @author arnau
+ *
+ */
 public class MultithreadInvertedIndexBuilder extends InvertedIndexBuilder{
 	/**
 	 * fillInvertedIndexMultithreading
@@ -37,19 +41,28 @@ public class MultithreadInvertedIndexBuilder extends InvertedIndexBuilder{
 
 	}
 	
+	/**
+	 * Computes a single file with a local InvertedIndex
+	 * @param invertedIndex thread safe
+	 * @param inputPath path to use
+	 * @throws IOException exception
+	 */
 	public static void computeSingleFile(ThreadSafeInvertedIndex invertedIndex, Path inputPath) throws IOException {
 		int i = 1;
+		InvertedIndex local=new InvertedIndex();
 		try (BufferedReader reader = Files.newBufferedReader(inputPath, StandardCharsets.UTF_8);) {
 			String line = null;
 			Stemmer stemmer = new SnowballStemmer(SnowballStemmer.ALGORITHM.ENGLISH);
 			String path = inputPath.toString();
 			while ((line = reader.readLine()) != null) {
 				for (String word : TextParser.parse(line)) {
-					invertedIndex.add(stemmer.stem(word).toString(), path, i++);
+					local.add(stemmer.stem(word).toString(), path, i++);
 				}
 			}
+			invertedIndex.addAll(local);
 		}
 	}
+
 	/**
 	 * Task class that Builds the invertedIndex using multithreading.
 	 * 
@@ -68,7 +81,8 @@ public class MultithreadInvertedIndexBuilder extends InvertedIndexBuilder{
 
 		/**
 		 * Task constructor
-		 * @param path path
+		 * 
+		 * @param path          path
 		 * @param invertedIndex invertedIndex passed
 		 */
 		public Task(Path path, ThreadSafeInvertedIndex invertedIndex) {
@@ -79,11 +93,9 @@ public class MultithreadInvertedIndexBuilder extends InvertedIndexBuilder{
 		@Override
 		public void run() {
 			try {
-				synchronized (invertedIndex) {
-					
-					computeSingleFile(invertedIndex, path);
-				}
-				
+
+				computeSingleFile(invertedIndex, path);
+
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

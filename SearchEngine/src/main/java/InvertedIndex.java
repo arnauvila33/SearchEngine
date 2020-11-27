@@ -45,6 +45,26 @@ public class InvertedIndex {
 			countMap.put(location, countMap.getOrDefault(location, 0) + 1);
 		}
 	}
+	
+	/**
+	 * Merges two inverted indexes together
+	 * 
+	 * @param invIndex the inverted index to useto merge
+	 */
+	public void addAll(InvertedIndex invIndex) {
+		for (String key : invIndex.get()) {
+			invertedIndex.putIfAbsent(key, new TreeMap<>());
+			for (String key1 : invIndex.get(key)) {
+				invertedIndex.get(key).putIfAbsent(key1, new TreeSet<>());
+				for (Integer inte : invIndex.get(key, key1)) {
+					boolean result = invertedIndex.get(key).get(key1).add(inte);
+					if (result) {
+						countMap.put(key1, countMap.getOrDefault(key1, 0) + 1);
+					}
+				}
+			}
+		}
+	}
 
 	/**
 	 * Determines whether the location is stored in the index.
@@ -127,7 +147,6 @@ public class InvertedIndex {
 	 * @return Integer
 	 */
 	public Integer getCount(String word) {
-		System.out.println("Word "+word);
 		return countMap.get(word);
 	}
 
