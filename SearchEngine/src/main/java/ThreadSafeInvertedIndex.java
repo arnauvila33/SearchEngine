@@ -42,6 +42,18 @@ public class ThreadSafeInvertedIndex extends InvertedIndex{
 			lock.writeLock().unlock();
 		}
 	}
+	
+	@Override
+	public void addAll(InvertedIndex invInde) {
+		lock.writeLock().lock();
+
+		try {
+			super.addAll(invInde);
+		}
+		finally {
+			lock.writeLock().unlock();
+		}
+	}
 	@Override
 	public boolean contains(String word) {
 		lock.readLock().lock();

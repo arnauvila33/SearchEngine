@@ -30,7 +30,7 @@ public class Driver {
 		
 		if(argumentMap.hasFlag("-url")) {
 			invertedIndex=new ThreadSafeInvertedIndex();
-			WebCrawler webCrawler=new WebCrawler(invertedIndex, argumentMap.getString("-url"),argumentMap.getInteger("-max", 1));
+			WebCrawler webCrawler=new WebCrawler((ThreadSafeInvertedIndex) invertedIndex, argumentMap.getString("-url"),argumentMap.getInteger("-max", 1),argumentMap.getInteger("-threads", 5));
 		}
  
 		else if (argumentMap.hasFlag("-path")) {

@@ -11,6 +11,7 @@ import opennlp.tools.stemmer.snowball.SnowballStemmer;
 
 
 public class MultithreadInvertedIndexBuilder extends InvertedIndexBuilder{
+	
 	/**
 	 * fillInvertedIndexMultithreading
 	 * 
@@ -19,6 +20,7 @@ public class MultithreadInvertedIndexBuilder extends InvertedIndexBuilder{
 	 * @param threads       thread num
 	 */
 	public static void fillInvertedIndexMultithread(ThreadSafeInvertedIndex invertedIndex, Path inputPath, int threads) {
+		//InvertedIndex local=new InvertedIndex();
 		try {
 			WorkQueue queue = new WorkQueue(threads);
 			if (Files.isDirectory(inputPath)) {
@@ -30,6 +32,7 @@ public class MultithreadInvertedIndexBuilder extends InvertedIndexBuilder{
 			} else {
 				queue.execute(new Task(inputPath, invertedIndex));
 			}
+			//invertedIndex.addAll(local);
 			queue.join();
 		} catch (IOException exception) {
 			System.out.println(exception);
@@ -39,15 +42,17 @@ public class MultithreadInvertedIndexBuilder extends InvertedIndexBuilder{
 	
 	public static void computeSingleFile(ThreadSafeInvertedIndex invertedIndex, Path inputPath) throws IOException {
 		int i = 1;
+		InvertedIndex ii=new InvertedIndex();
 		try (BufferedReader reader = Files.newBufferedReader(inputPath, StandardCharsets.UTF_8);) {
 			String line = null;
 			Stemmer stemmer = new SnowballStemmer(SnowballStemmer.ALGORITHM.ENGLISH);
 			String path = inputPath.toString();
 			while ((line = reader.readLine()) != null) {
 				for (String word : TextParser.parse(line)) {
-					invertedIndex.add(stemmer.stem(word).toString(), path, i++);
+					ii.add(stemmer.stem(word).toString(), path, i++);
 				}
 			}
+			invertedIndex.addAll(ii);
 		}
 	}
 	/**
@@ -79,10 +84,7 @@ public class MultithreadInvertedIndexBuilder extends InvertedIndexBuilder{
 		@Override
 		public void run() {
 			try {
-				synchronized (invertedIndex) {
-					
 					computeSingleFile(invertedIndex, path);
-				}
 				
 			} catch (IOException e) {
 				e.printStackTrace();

@@ -97,10 +97,8 @@ public class MultithreadQueryStructure extends QueryStructure{
 			String queryString = String.join(" ", stems);
 			if (!stems.isEmpty() && !queryStructure.containsKey(queryString)) {
 				ArrayList<InvertedIndex.SingleResult> results = invertedIndex.search(stems, exact);
-				System.out.println("Found");
 				synchronized (queryStructure) { 
 					queryStructure.put(queryString, results);
-					System.out.println("Added");
 				}
 			}
 

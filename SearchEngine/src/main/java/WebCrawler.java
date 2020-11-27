@@ -19,7 +19,7 @@ public class WebCrawler {
 	/**
 	 * InvertedIndex reference
 	 */
-	private final InvertedIndex invertedIndex;
+	//private final ThreadSafeInvertedIndex invertedIndex;
 	
 	/**
 	 * Total links visited
@@ -39,7 +39,19 @@ public class WebCrawler {
 	 * The queue to use
 	 */
 	private final Queue<URL> queue=new LinkedList<URL>();
-
+	
+	private WorkQueue queuew;
+	
+	/*
+	public static void buildIndexCrawler(ThreadSafeInvertedIndex invertedIndex, String url, int total, int threads) {
+		int count=0;
+		Queue<URL> URLqueue=new LinkedList<URL>();
+		WorkQueue workQueue=new WorkQueue(threads);
+		while(count<total) {
+			workQueue.execute(new Task(processURL(URLqueue.poll(), invertedIndex)));
+			count++;
+		}
+	}*/
 	
 	/**
 	 * WebCrawler constructor
@@ -47,12 +59,12 @@ public class WebCrawler {
 	 * @param url passed
 	 * @param total passed
 	 */
-	public WebCrawler(InvertedIndex invertedIndex, String url, int total) {
+	public WebCrawler(ThreadSafeInvertedIndex invertedIndex, String url, int total, int threads) {
 		totLinks = new ArrayList<URL>();
-		this.invertedIndex = invertedIndex;
+		//this.invertedIndex = invertedIndex;
 		this.total = total;
 		try {
-			processURL(new URL(url));
+			processURL(new URL(url), invertedIndex, threads);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
@@ -63,12 +75,16 @@ public class WebCrawler {
 	 * @param url passed
 	 * @throws MalformedURLException exception
 	 */
-	private void processURL(URL url) throws MalformedURLException {
+	private void processURL(URL url, ThreadSafeInvertedIndex invertedIndex, int threads) throws MalformedURLException {
 		queue.add(url);
+		queuew = new WorkQueue(threads);
 		while ((count < total)&&queue.size()>0) {
-			ArrayList<URL> temp= scrapper(queue.poll());
+			//queue.execute(new Task(queue.poll(), invertedIndex));
+			ArrayList<URL> temp= scrapper(queue.poll(), invertedIndex);
 			queue.addAll(temp);
+			count++;
 		}
+		queuew.join();
 	}
 	
 	/**
@@ -76,7 +92,7 @@ public class WebCrawler {
 	 * @param url passed
 	 * @return the list of urls to crawl
 	 */
-	private ArrayList<URL> scrapper(URL url) {
+	private ArrayList<URL> scrapper(URL url, ThreadSafeInvertedIndex invertedIndex) {
 		ArrayList<URL> links = new ArrayList<URL>();
 		try {
 
@@ -84,17 +100,17 @@ public class WebCrawler {
 				totLinks.add(url);
 				String html = HtmlFetcher.fetch(url, 3);
 				if (html != null) {
+					
 					html = HtmlCleaner.stripBlockElements(html);
 					for (URL x : LinkParser.getValidLinks(url, html)) {
-						if (!totLinks.contains(x))
 							links.add(x);
 					}
 
 					html = HtmlCleaner.stripTags(html);
 					html = HtmlCleaner.stripEntities(html);
-					// System.out.println(url + "\n");
-					computeSingleUrl(url.toString(), html);
-					count++;
+					queuew.execute(new Task(url.toString(),html, invertedIndex));
+					//computeSingleUrl(url.toString(), html);
+					
 				}
 			}
 
@@ -110,14 +126,17 @@ public class WebCrawler {
 	 * @param html passed
 	 * @throws IOException e
 	 */
-	private void computeSingleUrl(String url, String html) throws IOException {
+	private static void computeSingleUrl(String url, String html, ThreadSafeInvertedIndex invertedIndex) throws IOException {
 		int i = 1;
+		InvertedIndex local=new InvertedIndex();
 		Stemmer stemmer = new SnowballStemmer(SnowballStemmer.ALGORITHM.ENGLISH);
 		for (String word : TextParser.parse(html)) {
-			invertedIndex.add(stemmer.stem(word).toString(), url, i++);
+			local.add(stemmer.stem(word).toString(), url, i++);
 		}
+		invertedIndex.addAll(local);
 
 	}
+
 	/**
 	 * Task class that Builds the invertedIndex using multithreading.
 	 * 
@@ -132,45 +151,36 @@ public class WebCrawler {
 		/**
 		 * invertedIndex
 		 */
-		private final URL url;
-		
+		private final String url;
+
 		/**
-		 * InvertedIndex reference
+		 * invertedIndex
 		 */
-		private final InvertedIndex invertedIndex;
+		private final ThreadSafeInvertedIndex invertedIndex;
 
 		/**
 		 * Task constructor
-		 * @param path path
+		 * 
+		 * @param path          path
 		 * @param invertedIndex invertedIndex passed
 		 */
-		public Task(URL url, String html,InvertedIndex invertedIndex) {
+		public Task(String url, String html, ThreadSafeInvertedIndex invertedIndex) {
 			this.url = url;
 			this.html = html;
-			this.invertedIndex=invertedIndex;
+			this.invertedIndex = invertedIndex;
 		}
 
 		@Override
 		public void run() {
-			
-			/*try {			
-				html = HtmlFetcher.fetch(url, 3);
-				if (html != null) {
-					html = HtmlCleaner.stripBlockElements(html);
-					links1.addAll(LinkParser.getValidLinks(url, html));
-					html = HtmlCleaner.stripHtml(html);
-					System.out.println(url+"\n");
-					computeSingleFile(url.toString(), html);
-					count++;
-					for (URL x : links1) {
-						processURL(x);
-					}
-				}
-				 
+
+			try {
+
+				computeSingleUrl(url, html, invertedIndex);
+
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		*/}
+		}
 	}
 
 }
