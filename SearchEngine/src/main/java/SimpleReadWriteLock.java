@@ -184,7 +184,7 @@ public class SimpleReadWriteLock {
 				if (writers == 0) {
 					writers++;
 					curr = Thread.currentThread();
-					lock.notifyAll();
+					lock.notifyAll(); // TODO Why are you notifying here?
 				}
 
 			}

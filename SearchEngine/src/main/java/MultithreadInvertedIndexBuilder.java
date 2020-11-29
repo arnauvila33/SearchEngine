@@ -36,11 +36,13 @@ public class MultithreadInvertedIndexBuilder extends InvertedIndexBuilder{
 			}
 			queue.join();
 		} catch (IOException exception) {
-			System.out.println(exception);
+			System.out.println(exception); // TODO Better output
 		}
 
 	}
 	
+	// TODO Remove, use InvertedIndexBuilder version where needed to avoid so much duplicate code
+	// TODO Move the local/addAll logic into the run method
 	/**
 	 * Computes a single file with a local InvertedIndex
 	 * @param invertedIndex thread safe
@@ -97,7 +99,7 @@ public class MultithreadInvertedIndexBuilder extends InvertedIndexBuilder{
 				computeSingleFile(invertedIndex, path);
 
 			} catch (IOException e) {
-				e.printStackTrace();
+				e.printStackTrace(); // TODO Fix
 			}
 
 		}

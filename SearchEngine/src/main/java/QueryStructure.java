@@ -43,7 +43,7 @@ public class QueryStructure {
 	 */
 	public void processQuery(Path path, boolean exact) {
 
-		try {
+		try { // TODO Try with resources?
 			BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);
 			String line = null;
 			while ((line = reader.readLine()) != null) {
@@ -84,4 +84,4 @@ public class QueryStructure {
 	
 
 
-}
+} // TODO Why all these blank lines

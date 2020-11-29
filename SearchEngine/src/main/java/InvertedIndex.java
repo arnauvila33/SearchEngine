@@ -3,6 +3,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.Map.Entry;
 
+// TODO CLEAN UP TODO COMMENTS
 // TODO Create a thread-safe inverted index using the custom read/write lock class above.
 
 /**
@@ -51,12 +52,13 @@ public class InvertedIndex {
 	 * 
 	 * @param invIndex the inverted index to useto merge
 	 */
-	public void addAll(InvertedIndex invIndex) {
+	public void addAll(InvertedIndex invIndex) { // TODO Better variable names!
 		for (String key : invIndex.get()) {
 			invertedIndex.putIfAbsent(key, new TreeMap<>());
 			for (String key1 : invIndex.get(key)) {
 				invertedIndex.get(key).putIfAbsent(key1, new TreeSet<>());
 				for (Integer inte : invIndex.get(key, key1)) {
+					// TODO No need to add things one at a time
 					boolean result = invertedIndex.get(key).get(key1).add(inte);
 					if (result) {
 						countMap.put(key1, countMap.getOrDefault(key1, 0) + 1);
@@ -64,6 +66,41 @@ public class InvertedIndex {
 				}
 			}
 		}
+		
+		/*
+		 * TODO Inefficient Merge
+		 * 
+		 * Most data structures have a method that combines two data structures of the
+		 * same type. That is because if you can access the private data and make
+		 * assumptions about how that private data is stored, there are faster ways to
+		 * combine that data.
+		 * 
+		 * ...i.e. don't use your public methods... use invIndex.invertedIndex.keySet() etc.
+		 *
+		 * For instance, suppose the other inverted index has a word that this inverted 
+		 * index does not. There is nothing to accidentally overwrite in this inverted 
+		 * index. And, there is already a fully-formed inner map with locations and 
+		 * positions in the other index. Instead of copying those one at a time, we 
+		 * can do a single put operation to put that entire inner map into this index.
+		 *
+		 * But, you need to know if there IS overlap so you can combine the data together.
+		 * The putIfAbsent method doesn't work well for this. Instead, try:
+		 *
+		 * for each word in the other index... 
+		 *     if the word is not in this index...
+		 *         this.invertedIndex.put(word, invIndex.invertedIndex.get(word)); 
+		 *     else 
+		 *         apply this logic for inner levels of nesting 
+		 *         must loop through the locations here!
+		 *
+		 * Once you do that, then you have to figure out how to also merge the word
+		 * count maps. That should be a separate loop.
+		 *
+		 * for each location in the other word count map... 
+		 *     decide how to merge two counts if there is overlap
+		 *
+		 * Try to re-implement this method taking this approach!
+		 */
 	}
 
 	/**
