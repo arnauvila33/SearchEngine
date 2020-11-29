@@ -3,9 +3,6 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.Map.Entry;
 
-// TODO CLEAN UP TODO COMMENTS
-// TODO Create a thread-safe inverted index using the custom read/write lock class above.
-
 /**
  * A special type of simpleIndex that indexes the UNIQUE words that were found
  * in a text file.
@@ -46,61 +43,33 @@ public class InvertedIndex {
 			countMap.put(location, countMap.getOrDefault(location, 0) + 1);
 		}
 	}
-	
+
 	/**
 	 * Merges two inverted indexes together
 	 * 
-	 * @param invIndex the inverted index to useto merge
+	 * @param invertedIndex the inverted index to useto merge
 	 */
-	public void addAll(InvertedIndex invIndex) { // TODO Better variable names!
-		for (String key : invIndex.get()) {
-			invertedIndex.putIfAbsent(key, new TreeMap<>());
-			for (String key1 : invIndex.get(key)) {
-				invertedIndex.get(key).putIfAbsent(key1, new TreeSet<>());
-				for (Integer inte : invIndex.get(key, key1)) {
-					// TODO No need to add things one at a time
-					boolean result = invertedIndex.get(key).get(key1).add(inte);
-					if (result) {
-						countMap.put(key1, countMap.getOrDefault(key1, 0) + 1);
+	public void addAll(InvertedIndex invertedIndex) {
+		for (String word : invertedIndex.invertedIndex.keySet()) {
+			if (!this.invertedIndex.keySet().contains(word))
+				this.invertedIndex.put(word, invertedIndex.invertedIndex.get(word));
+			else {
+				for (String path : invertedIndex.invertedIndex.get(word).keySet()) {
+					if (!this.invertedIndex.get(word).keySet().contains(path))
+						this.invertedIndex.get(word).put(path, invertedIndex.invertedIndex.get(word).get(path));
+					else {
+						for (Integer inte : invertedIndex.invertedIndex.get(word).get(path)) {
+							if (!this.invertedIndex.get(word).get(path).contains(inte))
+								this.invertedIndex.get(word).get(path).add(inte);
+						}
 					}
 				}
 			}
 		}
-		
-		/*
-		 * TODO Inefficient Merge
-		 * 
-		 * Most data structures have a method that combines two data structures of the
-		 * same type. That is because if you can access the private data and make
-		 * assumptions about how that private data is stored, there are faster ways to
-		 * combine that data.
-		 * 
-		 * ...i.e. don't use your public methods... use invIndex.invertedIndex.keySet() etc.
-		 *
-		 * For instance, suppose the other inverted index has a word that this inverted 
-		 * index does not. There is nothing to accidentally overwrite in this inverted 
-		 * index. And, there is already a fully-formed inner map with locations and 
-		 * positions in the other index. Instead of copying those one at a time, we 
-		 * can do a single put operation to put that entire inner map into this index.
-		 *
-		 * But, you need to know if there IS overlap so you can combine the data together.
-		 * The putIfAbsent method doesn't work well for this. Instead, try:
-		 *
-		 * for each word in the other index... 
-		 *     if the word is not in this index...
-		 *         this.invertedIndex.put(word, invIndex.invertedIndex.get(word)); 
-		 *     else 
-		 *         apply this logic for inner levels of nesting 
-		 *         must loop through the locations here!
-		 *
-		 * Once you do that, then you have to figure out how to also merge the word
-		 * count maps. That should be a separate loop.
-		 *
-		 * for each location in the other word count map... 
-		 *     decide how to merge two counts if there is overlap
-		 *
-		 * Try to re-implement this method taking this approach!
-		 */
+
+		for (String path : invertedIndex.countMap.keySet()) {
+			this.countMap.put(path, invertedIndex.countMap.getOrDefault(path, 0));
+		}
 	}
 
 	/**
@@ -205,7 +174,7 @@ public class InvertedIndex {
 	 *         number of words stored for that element
 	 */
 	public int size(String word) {
-		
+
 		return get(word).size();
 	}
 
@@ -349,7 +318,7 @@ public class InvertedIndex {
 	 */
 	public ArrayList<SingleResult> exactSearch(Set<String> queries) {
 		ArrayList<SingleResult> queryResults = new ArrayList<SingleResult>();
-		Map<String, SingleResult> map = new HashMap<String, SingleResult>(); 
+		Map<String, SingleResult> map = new HashMap<String, SingleResult>();
 		for (String query : queries) {
 			if (contains(query)) {
 				makeSingleResult(map, queryResults, query);
@@ -358,12 +327,13 @@ public class InvertedIndex {
 		Collections.sort(queryResults);
 		return queryResults;
 	}
-	
+
 	/**
 	 * Method that makes the queryResults list
-	 * @param map map used
+	 * 
+	 * @param map          map used
 	 * @param queryResults the list to be made
-	 * @param word the query searched for
+	 * @param word         the query searched for
 	 */
 	public void makeSingleResult(Map<String, SingleResult> map, List<SingleResult> queryResults, String word) {
 		Iterator<Map.Entry<String, TreeSet<Integer>>> iterator = invertedIndex.get(word).entrySet().iterator();
@@ -378,6 +348,7 @@ public class InvertedIndex {
 			map.get(path).updateValues(word);
 		}
 	}
+
 	/**
 	 * Partial search of the queries passed.
 	 * 

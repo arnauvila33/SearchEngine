@@ -50,8 +50,8 @@ public class WorkQueue {
 		this.pending = 0;
 		this.shutdown = false;
 
-		if (threads == 0) // TODO What if threads is -12?
-			threads++;
+		if (threads <= 0)
+			threads = 1;
 		// start the threads so they are waiting in the background
 		for (int i = 0; i < threads; i++) {
 			workers[i] = new PoolWorker();
@@ -66,10 +66,10 @@ public class WorkQueue {
 	 * @param r work request (in the form of a {@link Runnable} object)
 	 */
 	public void execute(Runnable r) {
-		
+
 		incrementPending();
-		
-		synchronized (queue) {		
+
+		synchronized (queue) {
 			queue.addLast(r);
 			queue.notifyAll();
 		}
@@ -92,7 +92,8 @@ public class WorkQueue {
 	 * 
 	 */
 	public void finish() {
-		synchronized (queue) { // TODO Using wrong lock object. All access to pending must be protected using the same lock object
+		synchronized (queue) { // TODO Using wrong lock object. All access to pending must be protected using
+								// the same lock object
 			while (pending > 0) {
 				try {
 					queue.wait();
@@ -102,7 +103,7 @@ public class WorkQueue {
 					Thread.currentThread().interrupt();
 				}
 			}
-			
+
 		}
 	}
 
@@ -187,20 +188,13 @@ public class WorkQueue {
 					r.run();
 				} catch (RuntimeException ex) {
 					System.err.println("Warning: Work queue encountered an exception while running.");
-					ex.printStackTrace(); // TODO Remove
-				}
-				finally {
-					
-						decrementPending();
-					
+				} finally {
+
+					decrementPending();
+
 				}
 			}
 		}
 	}
-	
-	/*
-	 * TODO ONLY synchronize on the "this" keyword for code that
-	 * accesses the pending variable.
-	 */
 
 }

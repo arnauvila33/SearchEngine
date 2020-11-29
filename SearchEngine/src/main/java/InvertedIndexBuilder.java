@@ -9,8 +9,6 @@ import java.util.ArrayList;
 import opennlp.tools.stemmer.Stemmer;
 import opennlp.tools.stemmer.snowball.SnowballStemmer;
 
-// TODO Either extend your classes from previous projects or create completely new classes to support multithreading.
-
 /**
  * Inverted Index Builder class builds an inverted index data structure.
  * 
@@ -70,7 +68,6 @@ public class InvertedIndexBuilder {
 		}
 	}
 
-	// TODO This can be private
 	/**
 	 * Recursive function used to traverse all directories and find all .txt files.
 	 * 
@@ -79,7 +76,7 @@ public class InvertedIndexBuilder {
 	 * @return the list with all the text files found.
 	 * @throws IOException exception
 	 */
-	public static ArrayList<Path> traverseDirectory(Path directory, ArrayList<Path> list) throws IOException {
+	protected static ArrayList<Path> traverseDirectory(Path directory, ArrayList<Path> list) throws IOException {
 		try (DirectoryStream<Path> listing = Files.newDirectoryStream(directory)) {
 			for (Path path : listing) {
 				if (Files.isDirectory(path)) {
@@ -94,6 +91,4 @@ public class InvertedIndexBuilder {
 			return list;
 		}
 	}
-	
-
 }

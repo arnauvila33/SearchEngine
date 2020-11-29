@@ -39,12 +39,10 @@ public class QueryStructure {
 	 * Process Querie processes the querie with one thread.
 	 * 
 	 * @param path  path used to read querie
-	 * @param exact boolean that determines exact/partial Search 
+	 * @param exact boolean that determines exact/partial Search
 	 */
 	public void processQuery(Path path, boolean exact) {
-
-		try { // TODO Try with resources?
-			BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);
+		try (BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);) {
 			String line = null;
 			while ((line = reader.readLine()) != null) {
 				processResult(line, exact);
@@ -80,8 +78,5 @@ public class QueryStructure {
 	public void toJson(Path path) throws IOException {
 		SimpleJsonWriter.asQueryStructure(queryStructure, path);
 	}
-	
-	
 
-
-} // TODO Why all these blank lines
+}

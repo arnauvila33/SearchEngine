@@ -2,8 +2,6 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 
-// TODO Code is getting sloppy. Fix variable names, exception handling, and formatting before resubmitting. I shouldn't have to comment on those anymore!
-
 /**
  * Driver class to handle args
  * 
@@ -29,49 +27,30 @@ public class Driver {
 		InvertedIndex invertedIndex = null;
 		// QuerieStructure object
 		QueryStructure queryStructure = null;
- 
-		/*
-		 * TODO This is now way too complex. Need to simplify and reduce duplicate logic.
-		 * Take advantage of upcasting, only check for the -threads flag once.
-		 * 
-	 * InvertedIndex index = null; <--- do not initialize
-	 * ThreadSafeInvertedIndex threadSafe = null;
-	 * 
-	 * if (-threads) { 
-	 *     ThreadSafeInvertedIndex threadSafe = new ThreadSafeInvertedIndex(); 
-	 *     index = threadSafe; <--- upcast
-	 *     ...other stuff 
-	 * } 
-	 * else { 
-	 *     index = new InvertedIndex(); <--- no upcast
-	 * }
-	 * 
-	 * if (-path) {
-	 *     (a bit different because of the static methods which we can't upcast)
-	 *     if (threadSafe != null) { call mutli-threaded method }
-	 *     else { call single-threaded method }
-	 * }
-	 * 
-	 * if (-index) {
-	 *     try/catch index.toJson
-	 *     (will be either the normal or thread-safe version based on upcast)
-	 * }
-	 * 
-	 * ....
-		 */
-		
+		// Checks if it should be multiThreaded
+		boolean multiThreaded = argumentMap.hasFlag("-threads");
+
+		if (multiThreaded) {
+			ThreadSafeInvertedIndex threadSafe = new ThreadSafeInvertedIndex();
+			invertedIndex = threadSafe;
+			MultithreadQueryStructure multiThread = new MultithreadQueryStructure(
+					(ThreadSafeInvertedIndex) invertedIndex);
+			queryStructure = multiThread;
+		} else {
+			invertedIndex = new InvertedIndex();
+			queryStructure = new QueryStructure(invertedIndex);
+		}
 		if (argumentMap.hasFlag("-path")) {
 			Path path = argumentMap.getPath("-path");
-			if (argumentMap.hasFlag("-threads")) {
-				invertedIndex=new ThreadSafeInvertedIndex();
+			if (multiThreaded) {
 				try {
-					MultithreadInvertedIndexBuilder.fillInvertedIndexMultithread((ThreadSafeInvertedIndex) invertedIndex, path,
-							argumentMap.getInteger("-threads", 5));
+					MultithreadInvertedIndexBuilder.fillInvertedIndexMultithread(
+							(ThreadSafeInvertedIndex) invertedIndex, path, argumentMap.getInteger("-threads", 5));
 				} catch (Exception e) {
 					System.out.println("Unable to build inverted index from path: " + path);
 				}
 			} else {
-				invertedIndex=new InvertedIndex();
+
 				try {
 					InvertedIndexBuilder.fillInvertedIndex(invertedIndex, path);
 				} catch (Exception e) {
@@ -79,27 +58,25 @@ public class Driver {
 				}
 			}
 		}
-		else invertedIndex=new InvertedIndex();
 
 		if (argumentMap.hasFlag("-queries")) {
 			Path path = argumentMap.getPath("-queries");
-			if (argumentMap.hasFlag("-threads")) {
-				queryStructure=new MultithreadQueryStructure((ThreadSafeInvertedIndex)invertedIndex);
+			if (multiThreaded) {
 				try {
-					((MultithreadQueryStructure) queryStructure).processQueryMultithreading(path, argumentMap.hasFlag("-exact"),
-							argumentMap.getInteger("-threads", 5));
+					((MultithreadQueryStructure) queryStructure).processQueryMultithreading(path,
+							argumentMap.hasFlag("-exact"), argumentMap.getInteger("-threads", 5));
 				} catch (Exception e) {
-					System.out.println("Unable to build inverted index from path: " + argumentMap.getPath("-path"));
+					System.out.println("Unable to build inverted index from path: " + path);
 				}
 			} else {
-				queryStructure=new QueryStructure(invertedIndex);
+
 				try {
 					queryStructure.processQuery(path, argumentMap.hasFlag("-exact"));
 				} catch (Exception e) {
 					System.out.println("Unable to build querie from path" + path);
 				}
 			}
-		} else queryStructure=new QueryStructure(invertedIndex); // TODO ALways use braces
+		}
 		if (argumentMap.hasFlag("-index")) {
 			Path path = argumentMap.getPath("-index", Path.of("index.json"));
 			try {
