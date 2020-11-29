@@ -50,7 +50,7 @@ public class WorkQueue {
 		this.pending = 0;
 		this.shutdown = false;
 
-		if (threads == 0)
+		if (threads == 0) // TODO What if threads is -12?
 			threads++;
 		// start the threads so they are waiting in the background
 		for (int i = 0; i < threads; i++) {
@@ -92,7 +92,7 @@ public class WorkQueue {
 	 * 
 	 */
 	public void finish() {
-		synchronized (queue) {
+		synchronized (queue) { // TODO Using wrong lock object. All access to pending must be protected using the same lock object
 			while (pending > 0) {
 				try {
 					queue.wait();
@@ -143,7 +143,7 @@ public class WorkQueue {
 		assert pending > 0;
 		pending--;
 
-		synchronized (queue) {
+		synchronized (queue) { // TODO Nope! Must use same lock object that protects the read/write to pending
 			if (pending == 0) {
 				queue.notifyAll();
 			}
@@ -187,7 +187,7 @@ public class WorkQueue {
 					r.run();
 				} catch (RuntimeException ex) {
 					System.err.println("Warning: Work queue encountered an exception while running.");
-					ex.printStackTrace();
+					ex.printStackTrace(); // TODO Remove
 				}
 				finally {
 					

@@ -2,6 +2,8 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 
+// TODO Code is getting sloppy. Fix variable names, exception handling, and formatting before resubmitting. I shouldn't have to comment on those anymore!
+
 /**
  * Driver class to handle args
  * 
@@ -28,6 +30,36 @@ public class Driver {
 		// QuerieStructure object
 		QueryStructure queryStructure = null;
  
+		/*
+		 * TODO This is now way too complex. Need to simplify and reduce duplicate logic.
+		 * Take advantage of upcasting, only check for the -threads flag once.
+		 * 
+	 * InvertedIndex index = null; <--- do not initialize
+	 * ThreadSafeInvertedIndex threadSafe = null;
+	 * 
+	 * if (-threads) { 
+	 *     ThreadSafeInvertedIndex threadSafe = new ThreadSafeInvertedIndex(); 
+	 *     index = threadSafe; <--- upcast
+	 *     ...other stuff 
+	 * } 
+	 * else { 
+	 *     index = new InvertedIndex(); <--- no upcast
+	 * }
+	 * 
+	 * if (-path) {
+	 *     (a bit different because of the static methods which we can't upcast)
+	 *     if (threadSafe != null) { call mutli-threaded method }
+	 *     else { call single-threaded method }
+	 * }
+	 * 
+	 * if (-index) {
+	 *     try/catch index.toJson
+	 *     (will be either the normal or thread-safe version based on upcast)
+	 * }
+	 * 
+	 * ....
+		 */
+		
 		if (argumentMap.hasFlag("-path")) {
 			Path path = argumentMap.getPath("-path");
 			if (argumentMap.hasFlag("-threads")) {
@@ -67,7 +99,7 @@ public class Driver {
 					System.out.println("Unable to build querie from path" + path);
 				}
 			}
-		} else queryStructure=new QueryStructure(invertedIndex);
+		} else queryStructure=new QueryStructure(invertedIndex); // TODO ALways use braces
 		if (argumentMap.hasFlag("-index")) {
 			Path path = argumentMap.getPath("-index", Path.of("index.json"));
 			try {
