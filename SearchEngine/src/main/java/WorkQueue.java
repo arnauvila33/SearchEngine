@@ -92,11 +92,10 @@ public class WorkQueue {
 	 * 
 	 */
 	public void finish() {
-		synchronized (queue) { // TODO Using wrong lock object. All access to pending must be protected using
-								// the same lock object
+		synchronized (this) { 
 			while (pending > 0) {
 				try {
-					queue.wait();
+					this.wait();
 
 				} catch (InterruptedException ex) {
 					System.err.println("Warning: Work queue interrupted.");
@@ -144,9 +143,9 @@ public class WorkQueue {
 		assert pending > 0;
 		pending--;
 
-		synchronized (queue) { // TODO Nope! Must use same lock object that protects the read/write to pending
+		synchronized (this) { 
 			if (pending == 0) {
-				queue.notifyAll();
+				this.notifyAll();
 			}
 		}
 

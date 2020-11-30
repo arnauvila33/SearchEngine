@@ -26,20 +26,26 @@ public class Driver {
 		// InvertedIndex object
 		InvertedIndex invertedIndex = null;
 		// QuerieStructure object
-		QueryStructure queryStructure = null;
+		QueryStructureInterface queryStructure = null;
 		// Checks if it should be multiThreaded
 		boolean multiThreaded = argumentMap.hasFlag("-threads");
 
 		if (multiThreaded) {
 			ThreadSafeInvertedIndex threadSafe = new ThreadSafeInvertedIndex();
 			invertedIndex = threadSafe;
-			MultithreadQueryStructure multiThread = new MultithreadQueryStructure(
-					(ThreadSafeInvertedIndex) invertedIndex);
+			MultithreadQueryStructure multiThread = null;
+			try {
+				multiThread = new MultithreadQueryStructure((ThreadSafeInvertedIndex) invertedIndex,
+						argumentMap.getInteger("-threads", 5));
+			} catch (Exception e) {
+				System.out.println("Wrong thread input");
+			}
 			queryStructure = multiThread;
 		} else {
 			invertedIndex = new InvertedIndex();
 			queryStructure = new QueryStructure(invertedIndex);
 		}
+
 		if (argumentMap.hasFlag("-path")) {
 			Path path = argumentMap.getPath("-path");
 			if (multiThreaded) {
@@ -50,7 +56,6 @@ public class Driver {
 					System.out.println("Unable to build inverted index from path: " + path);
 				}
 			} else {
-
 				try {
 					InvertedIndexBuilder.fillInvertedIndex(invertedIndex, path);
 				} catch (Exception e) {
@@ -63,20 +68,19 @@ public class Driver {
 			Path path = argumentMap.getPath("-queries");
 			if (multiThreaded) {
 				try {
-					((MultithreadQueryStructure) queryStructure).processQueryMultithreading(path,
-							argumentMap.hasFlag("-exact"), argumentMap.getInteger("-threads", 5));
+					queryStructure.processQueryStructure(path, argumentMap.hasFlag("-exact"));
 				} catch (Exception e) {
 					System.out.println("Unable to build inverted index from path: " + path);
 				}
 			} else {
-
 				try {
-					queryStructure.processQuery(path, argumentMap.hasFlag("-exact"));
+					queryStructure.processQueryStructure(path, argumentMap.hasFlag("-exact"));
 				} catch (Exception e) {
 					System.out.println("Unable to build querie from path" + path);
 				}
 			}
 		}
+
 		if (argumentMap.hasFlag("-index")) {
 			Path path = argumentMap.getPath("-index", Path.of("index.json"));
 			try {
@@ -85,6 +89,7 @@ public class Driver {
 				System.out.println("Unable to write to the json file at" + path);
 			}
 		}
+
 		if (argumentMap.hasFlag("-results")) {
 			Path path = argumentMap.getPath("-results", Path.of("results.json"));
 			try {

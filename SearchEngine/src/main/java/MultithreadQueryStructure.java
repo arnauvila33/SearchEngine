@@ -33,7 +33,7 @@ import java.util.TreeSet;
  * @author arnau
  *
  */
-public class MultithreadQueryStructure extends QueryStructure {
+public class MultithreadQueryStructure implements QueryStructureInterface {
 
 	/**
 	 * holds a list of queries.
@@ -43,16 +43,19 @@ public class MultithreadQueryStructure extends QueryStructure {
 	 * invertedIndex used to build queryStructure
 	 */
 	private final ThreadSafeInvertedIndex invertedIndex;
+	
+	private final int threads;
 
 	/**
 	 * Constructor
 	 * 
 	 * @param invertedIndex to use
 	 */
-	public MultithreadQueryStructure(ThreadSafeInvertedIndex invertedIndex) {
-		super(invertedIndex);
+	public MultithreadQueryStructure(ThreadSafeInvertedIndex invertedIndex, int threads) {
+		//super(invertedIndex);
 		this.invertedIndex = invertedIndex;
 		queryStructure = new TreeMap<String, ArrayList<InvertedIndex.SingleResult>>();
+		this.threads=threads;
 	}
 
 	/**
@@ -64,6 +67,11 @@ public class MultithreadQueryStructure extends QueryStructure {
 	 */
 	public void processQueryMultithreading(Path path, boolean exact, int threads) {
 
+		
+
+	}
+	@Override
+	public void processQueryStructure(Path path, boolean exact) {
 		try (BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);) {
 			String line = null;
 			WorkQueue queue = new WorkQueue(threads);
@@ -73,8 +81,7 @@ public class MultithreadQueryStructure extends QueryStructure {
 			queue.join();
 		} catch (IOException e) {
 			System.out.println("Unable to read file " + path);
-		}
-
+		}		
 	}
 
 	@Override

@@ -2,8 +2,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 
-// TODO Formatting??
-
 /**
  * A special type of simpleIndex that indexes the UNIQUE words that were found
  * in a text file. THREAD-SAFE
