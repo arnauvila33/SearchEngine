@@ -43,13 +43,16 @@ public class MultithreadQueryStructure implements QueryStructureInterface {
 	 * invertedIndex used to build queryStructure
 	 */
 	private final ThreadSafeInvertedIndex invertedIndex;
-	
+	/**
+	 * Threads used
+	 */
 	private final int threads;
 
 	/**
 	 * Constructor
 	 * 
 	 * @param invertedIndex to use
+	 * @param threads number of threads to use
 	 */
 	public MultithreadQueryStructure(ThreadSafeInvertedIndex invertedIndex, int threads) {
 		//super(invertedIndex);
@@ -58,18 +61,7 @@ public class MultithreadQueryStructure implements QueryStructureInterface {
 		this.threads=threads;
 	}
 
-	/**
-	 * ProcessQueryMultithreading
-	 * 
-	 * @param path    path
-	 * @param exact   bool
-	 * @param threads thread number
-	 */
-	public void processQueryMultithreading(Path path, boolean exact, int threads) {
 
-		
-
-	}
 	@Override
 	public void processQueryStructure(Path path, boolean exact) {
 		try (BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);) {
@@ -111,8 +103,6 @@ public class MultithreadQueryStructure implements QueryStructureInterface {
 		/**
 		 * Task constructor
 		 * 
-		 * @param invertedIndex  object
-		 * @param queryStructure map
 		 * @param line           string
 		 * @param exact          boolean
 		 */
