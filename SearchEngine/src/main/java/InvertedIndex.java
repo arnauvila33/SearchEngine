@@ -4,6 +4,10 @@ import java.util.*;
 import java.util.Map.Entry;
 
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * A special type of simpleIndex that indexes the UNIQUE words that were found
@@ -45,19 +49,32 @@ public class InvertedIndex {
 			countMap.put(location, countMap.getOrDefault(location, 0) + 1);
 		}
 	}
-	
-	public void addAll(InvertedIndex invIndex) {
-		for(String key:invIndex.get()) {
-			invertedIndex.putIfAbsent(key,new TreeMap<>());
-			for(String key1:invIndex.get(key)) {
-				invertedIndex.get(key).putIfAbsent(key1, new TreeSet<>());
-				for(Integer inte:invIndex.get(key,key1)) {
-					boolean result = invertedIndex.get(key).get(key1).add(inte);
-					if (result) {
-						countMap.put(key1, countMap.getOrDefault(key1, 0) + 1);
+
+	/**
+	 * Merges two inverted indexes together
+	 * 
+	 * @param invertedIndex the inverted index to useto merge
+	 */
+	public void addAll(InvertedIndex invertedIndex) {
+		for (String word : invertedIndex.invertedIndex.keySet()) {
+			if (!this.invertedIndex.keySet().contains(word))
+				this.invertedIndex.put(word, invertedIndex.invertedIndex.get(word));
+			else {
+				for (String path : invertedIndex.invertedIndex.get(word).keySet()) {
+					if (!this.invertedIndex.get(word).keySet().contains(path))
+						this.invertedIndex.get(word).put(path, invertedIndex.invertedIndex.get(word).get(path));
+					else {
+						for (Integer inte : invertedIndex.invertedIndex.get(word).get(path)) {
+							if (!this.invertedIndex.get(word).get(path).contains(inte))
+								this.invertedIndex.get(word).get(path).add(inte);
+						}
 					}
 				}
 			}
+		}
+
+		for (String path : invertedIndex.countMap.keySet()) {
+			this.countMap.put(path, invertedIndex.countMap.getOrDefault(path, 0));
 		}
 	}
 
@@ -142,7 +159,6 @@ public class InvertedIndex {
 	 * @return Integer
 	 */
 	public Integer getCount(String word) {
-		System.out.println("Word "+word);
 		return countMap.get(word);
 	}
 
@@ -164,7 +180,7 @@ public class InvertedIndex {
 	 *         number of words stored for that element
 	 */
 	public int size(String word) {
-		
+
 		return get(word).size();
 	}
 
@@ -308,7 +324,7 @@ public class InvertedIndex {
 	 */
 	public ArrayList<SingleResult> exactSearch(Set<String> queries) {
 		ArrayList<SingleResult> queryResults = new ArrayList<SingleResult>();
-		Map<String, SingleResult> map = new HashMap<String, SingleResult>(); 
+		Map<String, SingleResult> map = new HashMap<String, SingleResult>();
 		for (String query : queries) {
 			if (contains(query)) {
 				makeSingleResult(map, queryResults, query);
@@ -317,12 +333,13 @@ public class InvertedIndex {
 		Collections.sort(queryResults);
 		return queryResults;
 	}
-	
+
 	/**
 	 * Method that makes the queryResults list
-	 * @param map map used
+	 * 
+	 * @param map          map used
 	 * @param queryResults the list to be made
-	 * @param word the query searched for
+	 * @param word         the query searched for
 	 */
 	public void makeSingleResult(Map<String, SingleResult> map, List<SingleResult> queryResults, String word) {
 		Iterator<Map.Entry<String, TreeSet<Integer>>> iterator = invertedIndex.get(word).entrySet().iterator();
@@ -337,6 +354,7 @@ public class InvertedIndex {
 			map.get(path).updateValues(word);
 		}
 	}
+
 	/**
 	 * Partial search of the queries passed.
 	 * 

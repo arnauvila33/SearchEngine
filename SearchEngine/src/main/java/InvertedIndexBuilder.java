@@ -76,7 +76,7 @@ public class InvertedIndexBuilder {
 	 * @return the list with all the text files found.
 	 * @throws IOException exception
 	 */
-	public static ArrayList<Path> traverseDirectory(Path directory, ArrayList<Path> list) throws IOException {
+	protected static ArrayList<Path> traverseDirectory(Path directory, ArrayList<Path> list) throws IOException {
 		try (DirectoryStream<Path> listing = Files.newDirectoryStream(directory)) {
 			for (Path path : listing) {
 				if (Files.isDirectory(path)) {
@@ -91,6 +91,4 @@ public class InvertedIndexBuilder {
 			return list;
 		}
 	}
-	
-
 }

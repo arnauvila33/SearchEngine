@@ -82,7 +82,7 @@ public class WebCrawler {
 			//queue.execute(new Task(queue.poll(), invertedIndex));
 			ArrayList<URL> temp= scrapper(queue.poll(), invertedIndex);
 			queue.addAll(temp);
-			count++;
+			
 		}
 		queuew.join();
 	}
@@ -109,8 +109,8 @@ public class WebCrawler {
 					html = HtmlCleaner.stripTags(html);
 					html = HtmlCleaner.stripEntities(html);
 					queuew.execute(new Task(url.toString(),html, invertedIndex));
-					//computeSingleUrl(url.toString(), html);
-					
+					//computeSingleUrl(url.toString(), html, invertedIndex);
+					count++;
 				}
 			}
 
@@ -126,14 +126,13 @@ public class WebCrawler {
 	 * @param html passed
 	 * @throws IOException e
 	 */
-	private static void computeSingleUrl(String url, String html, ThreadSafeInvertedIndex invertedIndex) throws IOException {
+	private static void computeSingleUrl(String url, String html, InvertedIndex invertedIndex) throws IOException {
 		int i = 1;
-		InvertedIndex local=new InvertedIndex();
 		Stemmer stemmer = new SnowballStemmer(SnowballStemmer.ALGORITHM.ENGLISH);
 		for (String word : TextParser.parse(html)) {
-			local.add(stemmer.stem(word).toString(), url, i++);
+			invertedIndex.add(stemmer.stem(word).toString(), url, i++);
 		}
-		invertedIndex.addAll(local);
+		
 
 	}
 
@@ -174,8 +173,9 @@ public class WebCrawler {
 		public void run() {
 
 			try {
-
-				computeSingleUrl(url, html, invertedIndex);
+				InvertedIndex local=new InvertedIndex();
+				computeSingleUrl(url, html, local);
+				invertedIndex.addAll(local);
 
 			} catch (IOException e) {
 				e.printStackTrace();

@@ -26,25 +26,41 @@ public class Driver {
 		// InvertedIndex object
 		InvertedIndex invertedIndex = null;
 		// QuerieStructure object
-		QueryStructure queryStructure = null;
+		QueryStructureInterface queryStructure = null;
+		// Checks if it should be multiThreaded
+		boolean multiThreaded = argumentMap.hasFlag("-threads");
 		
-		if(argumentMap.hasFlag("-url")) {
-			invertedIndex=new ThreadSafeInvertedIndex();
-			WebCrawler webCrawler=new WebCrawler((ThreadSafeInvertedIndex) invertedIndex, argumentMap.getString("-url"),argumentMap.getInteger("-max", 1),argumentMap.getInteger("-threads", 5));
+		
+		if (multiThreaded) {
+			ThreadSafeInvertedIndex threadSafe = new ThreadSafeInvertedIndex();
+			invertedIndex = threadSafe;
+			MultithreadQueryStructure multiThread = null;
+			try {
+				multiThread = new MultithreadQueryStructure((ThreadSafeInvertedIndex) invertedIndex,
+						argumentMap.getInteger("-threads", 5));
+			} catch (Exception e) {
+				System.out.println("Wrong thread input");
+			}
+			queryStructure = multiThread;
+		} else {
+			invertedIndex = new InvertedIndex();
+			queryStructure = new QueryStructure(invertedIndex);
 		}
- 
-		else if (argumentMap.hasFlag("-path")) {
+		if (argumentMap.hasFlag("-url")) {
+			WebCrawler webCrawler = new WebCrawler((ThreadSafeInvertedIndex) invertedIndex,
+					argumentMap.getString("-url"), argumentMap.getInteger("-max", 1),
+					argumentMap.getInteger("-threads", 5));
+		}
+		if (argumentMap.hasFlag("-path")) {
 			Path path = argumentMap.getPath("-path");
-			if (argumentMap.hasFlag("-threads")) {
-				invertedIndex=new ThreadSafeInvertedIndex();
+			if (multiThreaded) {
 				try {
-					MultithreadInvertedIndexBuilder.fillInvertedIndexMultithread((ThreadSafeInvertedIndex) invertedIndex, path,
-							argumentMap.getInteger("-threads", 5));
+					MultithreadInvertedIndexBuilder.fillInvertedIndexMultithread(
+							(ThreadSafeInvertedIndex) invertedIndex, path, argumentMap.getInteger("-threads", 5));
 				} catch (Exception e) {
 					System.out.println("Unable to build inverted index from path: " + path);
 				}
 			} else {
-				invertedIndex=new InvertedIndex();
 				try {
 					InvertedIndexBuilder.fillInvertedIndex(invertedIndex, path);
 				} catch (Exception e) {
@@ -52,27 +68,24 @@ public class Driver {
 				}
 			}
 		}
-		else invertedIndex=new InvertedIndex();
 
 		if (argumentMap.hasFlag("-queries")) {
 			Path path = argumentMap.getPath("-queries");
-			if (argumentMap.hasFlag("-threads")) {
-				queryStructure=new MultithreadQueryStructure((ThreadSafeInvertedIndex)invertedIndex);
+			if (multiThreaded) {
 				try {
-					((MultithreadQueryStructure) queryStructure).processQueryMultithreading(path, argumentMap.hasFlag("-exact"),
-							argumentMap.getInteger("-threads", 5));
+					queryStructure.processQueryStructure(path, argumentMap.hasFlag("-exact"));
 				} catch (Exception e) {
-					System.out.println("Unable to build inverted index from path: " + argumentMap.getPath("-path"));
+					System.out.println("Unable to build inverted index from path: " + path);
 				}
 			} else {
-				queryStructure=new QueryStructure(invertedIndex);
 				try {
-					queryStructure.processQuery(path, argumentMap.hasFlag("-exact"));
+					queryStructure.processQueryStructure(path, argumentMap.hasFlag("-exact"));
 				} catch (Exception e) {
 					System.out.println("Unable to build querie from path" + path);
 				}
 			}
-		} else queryStructure=new QueryStructure(invertedIndex);
+		}
+
 		if (argumentMap.hasFlag("-index")) {
 			Path path = argumentMap.getPath("-index", Path.of("index.json"));
 			try {
@@ -81,6 +94,7 @@ public class Driver {
 				System.out.println("Unable to write to the json file at" + path);
 			}
 		}
+
 		if (argumentMap.hasFlag("-results")) {
 			Path path = argumentMap.getPath("-results", Path.of("results.json"));
 			try {

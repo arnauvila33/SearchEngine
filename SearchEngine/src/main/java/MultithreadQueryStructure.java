@@ -8,10 +8,14 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+/**
+ * Multithreading Query Structure class
+ * 
+ * @author arnau
+ *
+ */
+public class MultithreadQueryStructure implements QueryStructureInterface {
 
-
-public class MultithreadQueryStructure extends QueryStructure{
-	
 	/**
 	 * holds a list of queries.
 	 */
@@ -20,37 +24,46 @@ public class MultithreadQueryStructure extends QueryStructure{
 	 * invertedIndex used to build queryStructure
 	 */
 	private final ThreadSafeInvertedIndex invertedIndex;
-	
-	public MultithreadQueryStructure(ThreadSafeInvertedIndex invertedIndex) {
-		super(invertedIndex);
-		this.invertedIndex=invertedIndex;
-		queryStructure = new TreeMap<String, ArrayList<InvertedIndex.SingleResult>>();
-	}
 	/**
-	 * ProcessQueryMultithreading
-	 * @param path path
-	 * @param exact bool
-	 * @param threads thread number
+	 * Threads used
 	 */
-	public void processQueryMultithreading(Path path, boolean exact, int threads)  {
-		
-		try(BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);) {	
+	private final int threads;
+
+	/**
+	 * Constructor
+	 * 
+	 * @param invertedIndex to use
+	 * @param threads number of threads to use
+	 */
+	public MultithreadQueryStructure(ThreadSafeInvertedIndex invertedIndex, int threads) {
+		//super(invertedIndex);
+		this.invertedIndex = invertedIndex;
+		queryStructure = new TreeMap<String, ArrayList<InvertedIndex.SingleResult>>();
+		this.threads=threads;
+	}
+
+
+	@Override
+	public void processQueryStructure(Path path, boolean exact) {
+		try (BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);) {
 			String line = null;
 			WorkQueue queue = new WorkQueue(threads);
 			while ((line = reader.readLine()) != null) {
-				queue.execute(new Task(invertedIndex, queryStructure, line,exact));
+				queue.execute(new Task(line, exact));
 			}
 			queue.join();
 		} catch (IOException e) {
-			System.out.println(e);
-		}
-		
-
+			System.out.println("Unable to read file " + path);
+		}		
 	}
+
 	@Override
 	public void toJson(Path path) throws IOException {
-		SimpleJsonWriter.asQueryStructure(queryStructure, path);
+		synchronized(queryStructure) {
+			SimpleJsonWriter.asQueryStructure(queryStructure, path);
+		}
 	}
+
 	/**
 	 * Task class used for partial/exact search with multithreading.
 	 * 
@@ -58,15 +71,7 @@ public class MultithreadQueryStructure extends QueryStructure{
 	 *
 	 */
 	private class Task implements Runnable {
-		
-		/**
-		 * queryStructure
-		 */
-		private final Map<String, ArrayList<InvertedIndex.SingleResult>> queryStructure;
-		/**
-		 * invertedIndex
-		 */
-		private final ThreadSafeInvertedIndex invertedIndex;
+
 		/**
 		 * exact boolean
 		 */
@@ -78,30 +83,28 @@ public class MultithreadQueryStructure extends QueryStructure{
 
 		/**
 		 * Task constructor
-		 * @param invertedIndex object
-		 * @param queryStructure map
-		 * @param line string
-		 * @param exact boolean
+		 * 
+		 * @param line           string
+		 * @param exact          boolean
 		 */
-		public Task(ThreadSafeInvertedIndex invertedIndex,Map<String, ArrayList<InvertedIndex.SingleResult>> queryStructure, String line, boolean exact) {
-			this.queryStructure=queryStructure;
-			this.exact=exact;
-			this.line=line;
-			this.invertedIndex=invertedIndex;
+		public Task(String line, boolean exact) {
+			this.exact = exact;
+			this.line = line;
 		}
 
 		@Override
 		public void run() {
-			System.out.println("Adding to query");
 			TreeSet<String> stems = TextFileStemmer.uniqueStems(line);
 			String queryString = String.join(" ", stems);
-			if (!stems.isEmpty() && !queryStructure.containsKey(queryString)) {
-				ArrayList<InvertedIndex.SingleResult> results = invertedIndex.search(stems, exact);
-				synchronized (queryStructure) { 
-					queryStructure.put(queryString, results);
+			synchronized (queryStructure) {
+				if (stems.isEmpty() || queryStructure.containsKey(queryString)) {
+					return;
 				}
 			}
-
+			ArrayList<InvertedIndex.SingleResult> results = invertedIndex.search(stems, exact);
+			synchronized (queryStructure) {
+				queryStructure.put(queryString, results);
+			}
 		}
 	}
 
