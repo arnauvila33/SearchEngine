@@ -8,24 +8,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-/*
- * TODO Design
- * 
- * In cases where there are common methods, but you can't reuse very much
- * code and have to either break encapsulation or create new private data, the
- * extends relationship doesn't really end up helping very much.
- * 
- * Create an interface with the common methods in your single and
- * multithreaded classes. Instead of extending, have both implement that
- * interface. Each class will have its own data and implementations. (There
- * will be some opportunity still for code reuse, which becomes more apparent
- * after you have the rest optimized.)
- * 
- * public class MultithreadQueryStructure implements QueryStructureInterface {
- * public class QueryStructure implements QueryStructureInterface { 
- * 
- * ...pass in the numebr of threads to the constructor instead the method for this
- */
 
 /**
  * Multithreading Query Structure class
