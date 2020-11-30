@@ -15,12 +15,7 @@ import opennlp.tools.stemmer.snowball.SnowballStemmer;
  *
  */
 public class WebCrawler {
-	
-	/**
-	 * InvertedIndex reference
-	 */
-	//private final ThreadSafeInvertedIndex invertedIndex;
-	
+
 	/**
 	 * Total links visited
 	 */
@@ -40,6 +35,9 @@ public class WebCrawler {
 	 */
 	private final Queue<URL> queue=new LinkedList<URL>();
 	
+	/**
+	 * Work Queue to use
+	 */
 	private WorkQueue queuew;
 	
 	/*

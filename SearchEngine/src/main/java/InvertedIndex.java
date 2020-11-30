@@ -4,11 +4,6 @@ import java.util.*;
 import java.util.Map.Entry;
 
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.*;
-import java.util.Map.Entry;
-
 /**
  * A special type of simpleIndex that indexes the UNIQUE words that were found
  * in a text file.
