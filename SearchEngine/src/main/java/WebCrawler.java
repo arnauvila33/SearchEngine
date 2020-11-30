@@ -56,6 +56,7 @@ public class WebCrawler {
 	 * @param invertedIndex passed
 	 * @param url passed
 	 * @param total passed
+	 * @param threads number of threads used
 	 */
 	public WebCrawler(ThreadSafeInvertedIndex invertedIndex, String url, int total, int threads) {
 		totLinks = new ArrayList<URL>();
@@ -71,6 +72,8 @@ public class WebCrawler {
 	/**
 	 * ProcessUrl method
 	 * @param url passed
+	 * @param invertedIndex passed
+	 * @param threads number of threads used
 	 * @throws MalformedURLException exception
 	 */
 	private void processURL(URL url, ThreadSafeInvertedIndex invertedIndex, int threads) throws MalformedURLException {
@@ -88,6 +91,7 @@ public class WebCrawler {
 	/**
 	 * Scraps url
 	 * @param url passed
+	 * @param invertedIndex passed
 	 * @return the list of urls to crawl
 	 */
 	private ArrayList<URL> scrapper(URL url, ThreadSafeInvertedIndex invertedIndex) {
@@ -119,9 +123,10 @@ public class WebCrawler {
 	}
 	
 	/**
-	 * ComputesingleUrl stems and adds url to invertedIndex.
-	 * @param url passed
-	 * @param html passed
+	 * Compute Single File
+	 * @param url to use
+	 * @param html passed 
+	 * @param invertedIndex passed
 	 * @throws IOException e
 	 */
 	private static void computeSingleUrl(String url, String html, InvertedIndex invertedIndex) throws IOException {
@@ -157,9 +162,9 @@ public class WebCrawler {
 
 		/**
 		 * Task constructor
-		 * 
-		 * @param path          path
-		 * @param invertedIndex invertedIndex passed
+		 * @param url passed
+		 * @param html passed 
+		 * @param invertedIndex to use
 		 */
 		public Task(String url, String html, ThreadSafeInvertedIndex invertedIndex) {
 			this.url = url;
