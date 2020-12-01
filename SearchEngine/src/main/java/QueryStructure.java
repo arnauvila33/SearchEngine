@@ -14,7 +14,7 @@ import java.util.TreeSet;
  * @author arnau
  *
  */
-public class QueryStructure implements QueryStructureInterface{
+public class QueryStructure implements QueryStructureInterface {
 
 	/**
 	 * holds a list of queries.
@@ -35,16 +35,12 @@ public class QueryStructure implements QueryStructureInterface{
 		this.invertedIndex = invertedIndex;
 	}
 
-	// TODO Make this a default implementation in the interface
 	@Override
-	public void processQueryStructure(Path path, boolean exact) {
-		try (BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);) {
-			String line = null;
-			while ((line = reader.readLine()) != null) {
-				processResult(line, exact);
-			}
-		} catch (IOException e) { // TODO Throw exceptions to Driver
-			System.out.println(e);
+	public void processQueryStructure(Path path, boolean exact) throws IOException {
+		BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);
+		String line = null;
+		while ((line = reader.readLine()) != null) {
+			processResult(line, exact);
 		}
 	}
 
@@ -64,17 +60,9 @@ public class QueryStructure implements QueryStructureInterface{
 		}
 	}
 
-	// TODO @Override
-	/**
-	 * Prints it to JSON
-	 * 
-	 * @param path to print to
-	 * @throws IOException exception
-	 */
+	@Override
 	public void toJson(Path path) throws IOException {
 		SimpleJsonWriter.asQueryStructure(queryStructure, path);
 	}
-
-
 
 }

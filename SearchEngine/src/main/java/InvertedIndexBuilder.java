@@ -68,7 +68,6 @@ public class InvertedIndexBuilder {
 		}
 	}
 
-	// TODO Decide on private or public, we aren't using protected in this class.
 	/**
 	 * Recursive function used to traverse all directories and find all .txt files.
 	 * 
@@ -77,7 +76,7 @@ public class InvertedIndexBuilder {
 	 * @return the list with all the text files found.
 	 * @throws IOException exception
 	 */
-	protected static ArrayList<Path> traverseDirectory(Path directory, ArrayList<Path> list) throws IOException {
+	public static ArrayList<Path> traverseDirectory(Path directory, ArrayList<Path> list) throws IOException {
 		try (DirectoryStream<Path> listing = Files.newDirectoryStream(directory)) {
 			for (Path path : listing) {
 				if (Files.isDirectory(path)) {

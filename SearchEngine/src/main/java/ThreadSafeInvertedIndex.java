@@ -57,6 +57,28 @@ public class ThreadSafeInvertedIndex extends InvertedIndex {
 	}
 
 	@Override
+	public boolean contains(String word, String path) {
+		lock.readLock().lock();
+
+		try {
+			return super.contains(word, path);
+		} finally {
+			lock.readLock().unlock();
+		}
+	}
+
+	@Override
+	public boolean contains(String word, String path, int position) {
+		lock.readLock().lock();
+
+		try {
+			return super.contains(word, path, position);
+		} finally {
+			lock.readLock().unlock();
+		}
+	}
+
+	@Override
 	public Collection<String> get() {
 		lock.readLock().lock();
 
@@ -165,5 +187,4 @@ public class ThreadSafeInvertedIndex extends InvertedIndex {
 		}
 	}
 
-	// TODO Missing contains methods
 }

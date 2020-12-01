@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-
 /**
  * Multithreading Query Structure class
  * 
@@ -34,36 +33,45 @@ public class MultithreadQueryStructure implements QueryStructureInterface {
 	 * Constructor
 	 * 
 	 * @param invertedIndex to use
-	 * @param threads number of threads to use
+	 * @param threads       number of threads to use
 	 */
 	public MultithreadQueryStructure(ThreadSafeInvertedIndex invertedIndex, int threads) {
-		//super(invertedIndex);
+		// super(invertedIndex);
 		this.invertedIndex = invertedIndex;
 		queryStructure = new TreeMap<String, ArrayList<InvertedIndex.SingleResult>>();
-		this.threads=threads;
+		this.threads = threads;
 	}
-
 
 	@Override
-	public void processQueryStructure(Path path, boolean exact) {
-		try (BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);) {
-			String line = null;
-			WorkQueue queue = new WorkQueue(threads);
-			while ((line = reader.readLine()) != null) {
-				queue.execute(new Task(line, exact));
-			}
-			queue.join();
-		} catch (IOException e) {
-			System.out.println("Unable to read file " + path);
+	public void processQueryStructure(Path path, boolean exact) throws IOException {
+		BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);
+		String line = null;
+		WorkQueue queue = new WorkQueue(threads);
+		while ((line = reader.readLine()) != null) {
+			queue.execute(new Task(line, exact));
 		}
+		queue.join();
 	}
-	
-	// TODO Override public void processResult(String line, boolean exact)
 
 	@Override
 	public void toJson(Path path) throws IOException {
-		synchronized(queryStructure) {
+		synchronized (queryStructure) {
 			SimpleJsonWriter.asQueryStructure(queryStructure, path);
+		}
+	}
+
+	@Override
+	public void processResult(String line, boolean exact) {
+		TreeSet<String> stems = TextFileStemmer.uniqueStems(line);
+		String queryString = String.join(" ", stems);
+		synchronized (queryStructure) {
+			if (stems.isEmpty() || queryStructure.containsKey(queryString)) {
+				return;
+			}
+		}
+		ArrayList<InvertedIndex.SingleResult> results = invertedIndex.search(stems, exact);
+		synchronized (queryStructure) {
+			queryStructure.put(queryString, results);
 		}
 	}
 
@@ -87,8 +95,8 @@ public class MultithreadQueryStructure implements QueryStructureInterface {
 		/**
 		 * Task constructor
 		 * 
-		 * @param line           string
-		 * @param exact          boolean
+		 * @param line  string
+		 * @param exact boolean
 		 */
 		public Task(String line, boolean exact) {
 			this.exact = exact;
@@ -97,17 +105,7 @@ public class MultithreadQueryStructure implements QueryStructureInterface {
 
 		@Override
 		public void run() {
-			TreeSet<String> stems = TextFileStemmer.uniqueStems(line);
-			String queryString = String.join(" ", stems);
-			synchronized (queryStructure) {
-				if (stems.isEmpty() || queryStructure.containsKey(queryString)) {
-					return;
-				}
-			}
-			ArrayList<InvertedIndex.SingleResult> results = invertedIndex.search(stems, exact);
-			synchronized (queryStructure) {
-				queryStructure.put(queryString, results);
-			}
+			processResult(line, exact);
 		}
 	}
 
