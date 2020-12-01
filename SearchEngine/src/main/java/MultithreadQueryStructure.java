@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+
 /**
  * Multithreading Query Structure class
  * 
@@ -54,8 +55,10 @@ public class MultithreadQueryStructure implements QueryStructureInterface {
 			queue.join();
 		} catch (IOException e) {
 			System.out.println("Unable to read file " + path);
-		}		
+		}
 	}
+	
+	// TODO Override public void processResult(String line, boolean exact)
 
 	@Override
 	public void toJson(Path path) throws IOException {

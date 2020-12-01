@@ -35,6 +35,7 @@ public class QueryStructure implements QueryStructureInterface{
 		this.invertedIndex = invertedIndex;
 	}
 
+	// TODO Make this a default implementation in the interface
 	@Override
 	public void processQueryStructure(Path path, boolean exact) {
 		try (BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);) {
@@ -42,7 +43,7 @@ public class QueryStructure implements QueryStructureInterface{
 			while ((line = reader.readLine()) != null) {
 				processResult(line, exact);
 			}
-		} catch (IOException e) {
+		} catch (IOException e) { // TODO Throw exceptions to Driver
 			System.out.println(e);
 		}
 	}
@@ -63,6 +64,7 @@ public class QueryStructure implements QueryStructureInterface{
 		}
 	}
 
+	// TODO @Override
 	/**
 	 * Prints it to JSON
 	 * 

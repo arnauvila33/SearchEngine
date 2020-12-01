@@ -21,4 +21,6 @@ public interface QueryStructureInterface {
 	 * @throws IOException exception
 	 */
 	public void toJson(Path path) throws IOException;
+	
+	// TODO public void processResult(String line, boolean exact)
 }

@@ -66,7 +66,7 @@ public class MultithreadInvertedIndexBuilder extends InvertedIndexBuilder{
 		@Override
 		public void run() {
 			try {
-				InvertedIndex local=new InvertedIndex();
+				InvertedIndex local = new InvertedIndex();
 				computeSingleFile(local, path);
 				invertedIndex.addAll(local);
 			} catch (IOException e) {
