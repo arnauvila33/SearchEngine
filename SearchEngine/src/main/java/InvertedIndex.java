@@ -58,6 +58,7 @@ public class InvertedIndex {
 					if (!this.invertedIndex.get(word).keySet().contains(path))
 						this.invertedIndex.get(word).put(path, invertedIndex.invertedIndex.get(word).get(path));
 					else {
+						// TODO Combine the two sets of positions using set.addAll instead
 						for (Integer inte : invertedIndex.invertedIndex.get(word).get(path)) {
 							if (!this.invertedIndex.get(word).get(path).contains(inte))
 								this.invertedIndex.get(word).get(path).add(inte);
@@ -68,6 +69,7 @@ public class InvertedIndex {
 		}
 
 		for (String path : invertedIndex.countMap.keySet()) {
+			// TODO If you add counts in your original add, you should add counts together here
 			this.countMap.put(path, invertedIndex.countMap.getOrDefault(path, 0));
 		}
 	}

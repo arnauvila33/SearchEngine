@@ -68,6 +68,7 @@ public class InvertedIndexBuilder {
 		}
 	}
 
+	// TODO Decide on private or public, we aren't using protected in this class.
 	/**
 	 * Recursive function used to traverse all directories and find all .txt files.
 	 * 

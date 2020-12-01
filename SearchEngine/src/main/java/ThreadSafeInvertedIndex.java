@@ -165,4 +165,5 @@ public class ThreadSafeInvertedIndex extends InvertedIndex {
 		}
 	}
 
+	// TODO Missing contains methods
 }

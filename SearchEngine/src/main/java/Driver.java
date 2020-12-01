@@ -25,16 +25,18 @@ public class Driver {
 		ArgumentMap argumentMap = new ArgumentMap(args);
 		// InvertedIndex object
 		InvertedIndex invertedIndex = null;
+		// TODO ThreadSafeInvertedIndex threadSafe = null;
 		// QuerieStructure object
 		QueryStructureInterface queryStructure = null;
 		// Checks if it should be multiThreaded
 		boolean multiThreaded = argumentMap.hasFlag("-threads");
 
-		if (multiThreaded) {
+		if (multiThreaded) { // TODO argumentMap.hasFlag("-threads");
 			ThreadSafeInvertedIndex threadSafe = new ThreadSafeInvertedIndex();
 			invertedIndex = threadSafe;
 			MultithreadQueryStructure multiThread = null;
 			try {
+				// TODO multiThread = new MultithreadQueryStructure(threadSafe, argumentMap.getInteger("-threads", 5));
 				multiThread = new MultithreadQueryStructure((ThreadSafeInvertedIndex) invertedIndex,
 						argumentMap.getInteger("-threads", 5));
 			} catch (Exception e) {
@@ -48,6 +50,20 @@ public class Driver {
 
 		if (argumentMap.hasFlag("-path")) {
 			Path path = argumentMap.getPath("-path");
+			
+			/* TODO 
+			try {
+				if (threadSafe != null) {
+					MultithreadInvertedIndexBuilder.fillInvertedIndexMultithread(threadSafe, path, argumentMap.getInteger("-threads", 5));
+				}
+				else {
+					
+				}
+			} catch (Exception e) {
+				System.out.println("Unable to build inverted index from path: " + path);
+			}
+			*/
+			
 			if (multiThreaded) {
 				try {
 					MultithreadInvertedIndexBuilder.fillInvertedIndexMultithread(
@@ -66,7 +82,7 @@ public class Driver {
 
 		if (argumentMap.hasFlag("-queries")) {
 			Path path = argumentMap.getPath("-queries");
-			if (multiThreaded) {
+			if (multiThreaded) { // TODO Remove if(multiThreaded)
 				try {
 					queryStructure.processQueryStructure(path, argumentMap.hasFlag("-exact"));
 				} catch (Exception e) {
