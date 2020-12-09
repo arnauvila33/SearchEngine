@@ -1,3 +1,4 @@
+import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
@@ -18,6 +19,7 @@ public class Driver {
 	 * @param args flag/value pairs used to start this program
 	 */
 	public static void main(String[] args) {
+		
 		// store initial start time
 		Instant start = Instant.now();
 
@@ -29,7 +31,8 @@ public class Driver {
 		ThreadSafeInvertedIndex threadSafe = null;
 		// QuerieStructure object
 		QueryStructureInterface queryStructure = null;
-
+		
+	
 		if (argumentMap.hasFlag("-threads")) {
 			threadSafe = new ThreadSafeInvertedIndex();
 			invertedIndex = threadSafe;
@@ -44,8 +47,16 @@ public class Driver {
 			invertedIndex = new InvertedIndex();
 			queryStructure = new QueryStructure(invertedIndex);
 		}
-
-		if (argumentMap.hasFlag("-path")) {
+		if (argumentMap.hasFlag("-url")) {
+			try {
+				WebCrawler webCrawler = new WebCrawler(threadSafe,
+					argumentMap.getString("-url"), argumentMap.getInteger("-max", 0),
+					argumentMap.getInteger("-threads", 5));
+			} catch (MalformedURLException e) {
+				System.out.println("Unable to build crawler from url: " + argumentMap.getString("-url"));                                                                                                           
+			}
+		}
+		else if (argumentMap.hasFlag("-path")) {
 			Path path = argumentMap.getPath("-path");
 			try {
 				if (argumentMap.hasFlag("-threads")) {
@@ -58,7 +69,13 @@ public class Driver {
 				System.out.println("Unable to build inverted index from path: " + path);
 			}
 		}
-
+		if(argumentMap.hasFlag("-server")) {
+			try {
+				SearchServer server=new SearchServer(argumentMap.getInteger("-server", 8080), threadSafe);
+			} catch (Exception e) {
+				System.out.println("Unable to start server at port: "+argumentMap.getInteger("-server", 8080));
+			}
+		}
 		if (argumentMap.hasFlag("-queries")) {
 			Path path = argumentMap.getPath("-queries");
 			try {

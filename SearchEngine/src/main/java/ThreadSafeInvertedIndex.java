@@ -2,6 +2,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 
+
+
 /**
  * A special type of simpleIndex that indexes the UNIQUE words that were found
  * in a text file. THREAD-SAFE
@@ -185,6 +187,16 @@ public class ThreadSafeInvertedIndex extends InvertedIndex {
 		} finally {
 			lock.readLock().unlock();
 		}
+	}
+	
+	public ArrayList<SingleResult> partialSearch(Set<String> queries) {
+		lock.readLock().lock();
+		try {
+			return super.partialSearch(queries);
+		} finally {
+			lock.readLock().unlock();
+		}
+		
 	}
 
 }

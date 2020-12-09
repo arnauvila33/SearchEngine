@@ -1,0 +1,34 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>${title}</title>
+</head>
+
+<body>
+  <h1>Arnau's Search Engine</h1>
+  
+
+  <form method="${method}" action="${action}">
+    
+    <p>
+      Type URL to Crawl <input type="text" name="url" id="url" maxlength="100" size="60"> And Max Number of URL to Crawl
+      <input type="text" name="max" id="max" maxlength="3" size="3"> <br> <br>
+      <label for="message">Type to Search:</label>
+      <input type="text" name="message" id="message" maxlength="100" size="50">
+      <br>
+      Search in Descending Order <input type="checkbox" name="descending" id="descending" maxlength="60" size="60">
+      Do an Exact Search <input type="checkbox" name="exact" id="exact" maxlength="60" size="60">
+    </p>
+    
+    <p><input type="submit" value="Search"></p>
+    <p><input type="submit" name="lucky" value="Feeling Lucky"></p>
+  </form>
+  
+  <p>Your Search Results:<br>
+   ${messages}</p>
+
+</body>
+</html>
