@@ -113,8 +113,6 @@ public class WebCrawler2 {
 		@Override
 		public void run() {
 			InvertedIndex local=new InvertedIndex();
-			//ArrayList<URL> links = new ArrayList<URL>();
-			System.out.println("hERE!");
 			try {
 				if (!totLinks.contains(url)&&count<=total) {
 					
@@ -132,7 +130,6 @@ public class WebCrawler2 {
 						html = HtmlCleaner.stripTags(html);
 						html = HtmlCleaner.stripEntities(html);
 						computeSingleUrl(url.toString(), html, local);
-						// queuew.execute(new Task(url.toString(), html, invertedIndex));
 						invertedIndex.addAll(local);
 						count++;
 						

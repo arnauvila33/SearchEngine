@@ -132,7 +132,7 @@ public class SearchEngineServlet extends HttpServlet {
 		}
 
 		response.setStatus(HttpServletResponse.SC_OK);
-		log.info(request.getParameter("lucky"));
+
 		if (request.getParameter("lucky") != null && searchResults.size() != 0) {
 			response.sendRedirect(searchResults.get(0).getWhere());
 		} else

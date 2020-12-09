@@ -37,7 +37,7 @@ public class WebCrawler {
 	/**
 	 * Work Queue to use
 	 */
-	private WorkQueue queuew;
+	private WorkQueue workQueue;
 
 	/**
 	 * WebCrawler constructor
@@ -58,16 +58,6 @@ public class WebCrawler {
 
 	}
 
-	/*
-	 * public static void startCrawl(ThreadSafeInvertedIndex invertedIndex, String
-	 * url, int total, int threads) throws MalformedURLException { ArrayList<URL>
-	 * totLinks = new ArrayList<URL>(); Queue<URL> queue = new LinkedList<URL>();
-	 * queue.add(new URL(url)); WorkQueue queuew=new WorkQueue(threads); int
-	 * count=0; while(count<total && queue.size() > 0) { ArrayList<URL> temp =
-	 * scrapper(queue.poll(), invertedIndex, totLinks, queuew); //queuew.execute(new
-	 * Task(queue.poll().toString(), totLinks, invertedIndex)); if(temp.size()>0) {
-	 * queue.addAll(temp); count++; } } queuew.join(); }
-	 */
 
 	/**
 	 * ProcessUrl method
@@ -80,14 +70,14 @@ public class WebCrawler {
 	private void processURL(URL url, ThreadSafeInvertedIndex invertedIndex, int threads, ArrayList<URL> totLinks)
 			throws MalformedURLException {
 		queue.add(url);
-		queuew = new WorkQueue(threads);
+		workQueue = new WorkQueue(threads);
 		while ((count < total) && queue.size() > 0) {
 			// queue.execute(new Task(queue.poll(), invertedIndex));
 			ArrayList<URL> temp = scrapper(queue.poll(), invertedIndex);
 			queue.addAll(temp);
 
 		}
-		queuew.join();
+		workQueue.join();
 	}
 
 	/**
@@ -113,7 +103,7 @@ public class WebCrawler {
 
 					html = HtmlCleaner.stripTags(html);
 					html = HtmlCleaner.stripEntities(html);
-					queuew.execute(new Task(url.toString(), html, invertedIndex));
+					workQueue.execute(new Task(url.toString(), html, invertedIndex));
 					count++;
 				}
 			}
