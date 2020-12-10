@@ -1,6 +1,5 @@
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -102,6 +101,17 @@ public class SearchEngineServlet extends HttpServlet {
 		String message = request.getParameter("message");
 		String[] descending = request.getParameterValues("descending");
 		String[] exact = request.getParameterValues("exact");
+		String url = request.getParameter("url");
+		String max = request.getParameter("max");
+
+		if (url != null && request.getParameter("crawl") != null) {
+			@SuppressWarnings("unused")
+			WebCrawler temp;
+			if (max != null)
+				temp = new WebCrawler(invertedIndex, url, Integer.valueOf(max), 5);
+			else
+				temp = new WebCrawler(invertedIndex, url, 0, 5);
+		}
 
 		message = message == null ? "" : message;
 

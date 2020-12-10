@@ -49,6 +49,7 @@ public class Driver {
 		}
 		if (argumentMap.hasFlag("-url")) {
 			try {
+				@SuppressWarnings("unused")
 				WebCrawler webCrawler = new WebCrawler(threadSafe,
 					argumentMap.getString("-url"), argumentMap.getInteger("-max", 0),
 					argumentMap.getInteger("-threads", 5));
@@ -56,7 +57,7 @@ public class Driver {
 				System.out.println("Unable to build crawler from url: " + argumentMap.getString("-url"));                                                                                                           
 			}
 		}
-		else if (argumentMap.hasFlag("-path")) {
+		else if (argumentMap.hasFlag("-Wpath")) {
 			Path path = argumentMap.getPath("-path");
 			try {
 				if (argumentMap.hasFlag("-threads")) {
@@ -71,6 +72,7 @@ public class Driver {
 		}
 		if(argumentMap.hasFlag("-server")) {
 			try {
+				@SuppressWarnings("unused")
 				SearchServer server=new SearchServer(argumentMap.getInteger("-server", 8080), threadSafe);
 			} catch (Exception e) {
 				System.out.println("Unable to start server at port: "+argumentMap.getInteger("-server", 8080));
