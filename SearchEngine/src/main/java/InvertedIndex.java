@@ -354,7 +354,7 @@ public class InvertedIndex {
 	 */
 	public ArrayList<SingleResult> partialSearch(Set<String> queries) {
 		ArrayList<SingleResult> queryResults = new ArrayList<SingleResult>();
-		System.out.println("Doing the search");
+		// TODO System.out.println("Doing the search");
 		Map<String, SingleResult> map = new HashMap<String, SingleResult>();
 		for (String query : queries) {
 			for (String word : invertedIndex.tailMap(query).keySet()) {

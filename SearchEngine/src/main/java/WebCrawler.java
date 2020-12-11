@@ -2,8 +2,10 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
+
 import opennlp.tools.stemmer.Stemmer;
 import opennlp.tools.stemmer.snowball.SnowballStemmer;
 
@@ -18,7 +20,7 @@ public class WebCrawler {
 	/**
 	 * Total links visited
 	 */
-	private final ArrayList<URL> totLinks;
+	private final HashSet<URL> totLinks; // TODO Use HashSet
 
 	/**
 	 * The count of total links
@@ -50,7 +52,7 @@ public class WebCrawler {
 	 */
 	public WebCrawler(ThreadSafeInvertedIndex invertedIndex, String url, int total, int threads)
 			throws MalformedURLException {
-		totLinks = new ArrayList<URL>();
+		totLinks = new HashSet<URL>();
 		// this.invertedIndex = invertedIndex;
 		this.total = total;
 
@@ -67,7 +69,7 @@ public class WebCrawler {
 	 * @param threads       number of threads used
 	 * @throws MalformedURLException exception
 	 */
-	private void processURL(URL url, ThreadSafeInvertedIndex invertedIndex, int threads, ArrayList<URL> totLinks)
+	private void processURL(URL url, ThreadSafeInvertedIndex invertedIndex, int threads, HashSet<URL> totLinks)
 			throws MalformedURLException {
 		queue.add(url);
 		workQueue = new WorkQueue(threads);

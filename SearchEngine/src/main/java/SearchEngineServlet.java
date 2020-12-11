@@ -75,7 +75,7 @@ public class SearchEngineServlet extends HttpServlet {
 
 		// compile all of the messages together
 		// keep in mind multiple threads may access this at once!
-		values.put("messages", String.join("\n\n", results));
+		values.put("messages", String.join("\n\n", results)); // TODO Not protected read access
 
 		// generate html from template
 		StringSubstitutor replacer = new StringSubstitutor(values);
@@ -105,7 +105,7 @@ public class SearchEngineServlet extends HttpServlet {
 		String max = request.getParameter("max");
 
 		if (url != null && request.getParameter("crawl") != null) {
-			@SuppressWarnings("unused")
+			@SuppressWarnings("unused") // TODO Don't do this!
 			WebCrawler temp;
 			if (max != null)
 				temp = new WebCrawler(invertedIndex, url, Integer.valueOf(max), 5);

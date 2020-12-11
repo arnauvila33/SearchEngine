@@ -44,6 +44,7 @@ public class MultithreadQueryStructure implements QueryStructureInterface {
 
 	@Override
 	public void processQueryStructure(Path path, boolean exact) throws IOException {
+		// TODO try-with-resources
 		BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);
 		String line = null;
 		WorkQueue queue = new WorkQueue(threads);
