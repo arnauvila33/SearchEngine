@@ -12,7 +12,7 @@ public class SearchServer {
 	/**
 	 * Port used to start server
 	 */
-	public static int PORT;
+	private final int PORT;
 
 	/**
 	 * SearchServer Constructor method
