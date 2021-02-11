@@ -4,7 +4,7 @@ import java.time.Duration;
 import java.time.Instant;
 
 /**
- * Driver class to handle args
+ * Driver class to handle the input and start the program.
  * 
  * @author Arnau Vila
  *
